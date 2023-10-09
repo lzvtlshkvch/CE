@@ -499,5 +499,3 @@ def Find_Optimal_Cutoff(target, predicted):
 
     return list(roc_t['threshold']) 
 
-# threshold = Find_Optimal_Cutoff(data_train['default_12m'], logistic.predict_proba(X_train)[:, 1])
-# print (threshold)
