@@ -41,8 +41,8 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import LinearSVC
 
 def plot_categorical(df, target, var, ax):
-  good = df[df['target']== 1][var].value_counts()
-  bad  = df[df['target']== 0][var].value_counts()
+  good = df[df[target]== 1][var].value_counts()
+  bad  = df[df[target]== 0][var].value_counts()
   pd.DataFrame({'good' : good.sort_index(), 'bad' : bad.sort_index()}).plot.bar(stacked = False, ax = ax);
   ax.set_title(var + f': {df[["credit_appr", var]].corr().iloc[0,1] :.3f}');
 
