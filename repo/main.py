@@ -529,8 +529,8 @@ def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis):
                       CalcGini(y_test, preds_test[:,1]), 
                       (CalcGini(y_test, preds_test[:,1])-\
                        CalcGini(y_train, preds_train[:,1]))/CalcGini(y_train, preds_train[:,1])*100,
-                      roc_curve(y_train, preds_train[:,1]),\
-                      roc_curve(y_test, preds_test[:,1]),\
+                      roc_auc_score(y_train, preds_train[:,1]),\
+                      roc_auc_score(y_test, preds_test[:,1]),\
                       f1_score([1 if i > 0.5 else 0 for i in preds_train[:,1]], y_train),
                       f1_score([1 if i > 0.5 else 0 for i in preds_test[:,1]], y_test),
                      FPR_train, FNR_train, FPR_test, FNR_test]
