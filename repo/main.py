@@ -499,3 +499,33 @@ def Find_Optimal_Cutoff(target, predicted):
 
     return list(roc_t['threshold']) 
 
+def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis)
+  preds_train = model.predict_proba(X_train)
+  preds_test = model.predict_proba(X_test)
+  
+  cm = confusion_matrix(y_train, [1 if i > 0.5 else 0 for i in preds_train[:,1]])
+  TP = cm[0][0]
+  FP = cm[0][1]
+  FN = cm[1][0]
+  TN = cm[1][1]
+  
+  FPR_train = FP/(FP+TN)
+  FNR_train = FN/(TP+FN)
+  
+  cm = confusion_matrix(y_test, [1 if i > 0.5 else 0 for i in preds_test[:,1]])
+  TP = cm[0][0]
+  FP = cm[0][1]
+  FN = cm[1][0]
+  TN = cm[1][1]
+  
+  FPR_test = FP/(FP+TN)
+  FNR_test = FN/(TP+FN)
+  
+  all_ginis.loc[i] = [name, CalcGini(y_train, preds_train[:,1]),\
+                      CalcGini(y_test, preds_test[:,1]), 
+                      (CalcGini(y_test, preds_test[:,1])-\
+                       CalcGini(y_train, preds_train[:,1]))/CalcGini(y_train, preds_train[:,1])*100,
+                      f1_score([1 if i > 0.5 else 0 for i in preds_train[:,1]], y_train),
+                      f1_score([1 if i > 0.5 else 0 for i in preds_test[:,1]], y_test),
+                     FPR_train, FNR_train, FPR_test, FNR_test]
+  
