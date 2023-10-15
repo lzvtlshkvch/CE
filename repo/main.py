@@ -499,7 +499,11 @@ def Find_Optimal_Cutoff(target, predicted):
 
     return list(roc_t['threshold']) 
 
-def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis)
+# all_ginis = pd.DataFrame(columns = ['Model', 'Gini Train', 'Gini Test',
+#                                     'Gini Variance, %', 'F1 train', 'F1 test',
+#                                     'FPR Train', 'FNR Train', 'FPR Test', 'FNR Test'])
+
+def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis):
   preds_train = model.predict_proba(X_train)
   preds_test = model.predict_proba(X_test)
   
