@@ -509,13 +509,13 @@ def Find_Optimal_Cutoff(target, predicted):
 
 def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis):
   if name == 'DNN':
-    preds_train = model.predict(X_train)
-    preds_test = model.predict(X_test)
+    preds_train = model.predict(X_train).reshape(1, -1)[0]
+    preds_test = model.predict(X_test).reshape(1, -1)[0]
   else:
-    preds_train = model.predict_proba(X_train)
-    preds_test = model.predict_proba(X_test)
+    preds_train = model.predict_proba(X_train)[:,1]
+    preds_test = model.predict_proba(X_test)[:,1]
   
-  cm = confusion_matrix(y_train, [1 if i > 0.5 else 0 for i in preds_train[:,1]])
+  cm = confusion_matrix(y_train, [1 if i > 0.5 else 0 for i in preds_train])
   TP = cm[0][0]
   FP = cm[0][1]
   FN = cm[1][0]
@@ -524,7 +524,7 @@ def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis):
   FPR_train = FP/(FP+TN)
   FNR_train = FN/(TP+FN)
   
-  cm = confusion_matrix(y_test, [1 if i > 0.5 else 0 for i in preds_test[:,1]])
+  cm = confusion_matrix(y_test, [1 if i > 0.5 else 0 for i in preds_test])
   TP = cm[0][0]
   FP = cm[0][1]
   FN = cm[1][0]
@@ -533,14 +533,14 @@ def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis):
   FPR_test = FP/(FP+TN)
   FNR_test = FN/(TP+FN)
   
-  all_ginis.loc[i] = [name, CalcGini(y_train, preds_train[:,1]),\
-                      CalcGini(y_test, preds_test[:,1]), 
-                      (CalcGini(y_test, preds_test[:,1])-\
-                       CalcGini(y_train, preds_train[:,1]))/CalcGini(y_train, preds_train[:,1])*100,
-                      roc_auc_score(y_train, preds_train[:,1]),\
-                      roc_auc_score(y_test, preds_test[:,1]),\
-                      f1_score([1 if i > 0.5 else 0 for i in preds_train[:,1]], y_train),
-                      f1_score([1 if i > 0.5 else 0 for i in preds_test[:,1]], y_test),
+  all_ginis.loc[i] = [name, CalcGini(y_train, preds_train),\
+                      CalcGini(y_test, preds_test), 
+                      (CalcGini(y_test, preds_test)-\
+                       CalcGini(y_train, preds_train))/CalcGini(y_train, preds_train)*100,
+                      roc_auc_score(y_train, preds_train),\
+                      roc_auc_score(y_test, preds_test),\
+                      f1_score([1 if i > 0.5 else 0 for i in preds_train], y_train),
+                      f1_score([1 if i > 0.5 else 0 for i in preds_test], y_test),
                      FPR_train, FNR_train, FPR_test, FNR_test]
   
   
