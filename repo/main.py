@@ -40,6 +40,10 @@ from sklearn.svm import SVC
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import LinearSVC
 
+from keras.callbacks import TensorBoard
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+
 def plot_categorical(df, target, var, ax):
   good = df[df[target]== 1][var].value_counts()
   bad  = df[df[target]== 0][var].value_counts()
@@ -535,3 +539,27 @@ def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis):
                       f1_score([1 if i > 0.5 else 0 for i in preds_test[:,1]], y_test),
                      FPR_train, FNR_train, FPR_test, FNR_test]
   
+  
+logboard = TensorBoard(log_dir='.logs', histogram_freq=0, write_graph=True, write_images=False, update_freq='epoch')
+
+def build_dnn(dim_0, dim_1, dim_2, activation_0, activation_1, activation_2, dropout_0, dropout_1, dropout_2,
+              optimizer, loss, dim_out):
+    model = Sequential()
+
+    model.add(Dense(dim_0, activation=activation_0, kernel_initializer='uniform'))
+    if dropout_0 is not None:
+        model.add(Dropout(dropout_0))
+
+    model.add(Dense(dim_1, activation=activation_1, kernel_initializer='uniform'))
+    if dropout_1 is not None:
+        model.add(Dropout(dropout_1))
+
+    model.add(Dense(dim_2, activation=activation_2, kernel_initializer='uniform'))  # uniform, random_normal
+    if dropout_2 is not None:
+        model.add(Dropout(dropout_2))
+
+    model.add(Dense(dim_out, activation='sigmoid'))
+
+    model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
+
+    return model
