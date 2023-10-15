@@ -508,8 +508,12 @@ def Find_Optimal_Cutoff(target, predicted):
 #                                     'FPR Train', 'FNR Train', 'FPR Test', 'FNR Test'])
 
 def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis):
-  preds_train = model.predict_proba(X_train)
-  preds_test = model.predict_proba(X_test)
+  if name == 'DNN':
+    preds_train = model.predict(X_train)
+    preds_test = model.predict(X_test)
+  else:
+    preds_train = model.predict_proba(X_train)
+    preds_test = model.predict_proba(X_test)
   
   cm = confusion_matrix(y_train, [1 if i > 0.5 else 0 for i in preds_train[:,1]])
   TP = cm[0][0]
