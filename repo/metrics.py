@@ -8,7 +8,22 @@ from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import LocalOutlierFactor
 
-from sace.dummy_scaler import DummyScaler
+class DummyScaler:
+
+    def __init__(self):
+        pass
+
+    def fit(self, X):
+        pass
+
+    def fit_transform(self, X):
+        return X
+
+    def transform(self, X):
+        return X
+
+    def inverse_transform(self, X):
+        return X
 
 
 def nbr_valid_cf(cf_list, b, y_val, y_desidered=None):
