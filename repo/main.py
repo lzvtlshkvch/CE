@@ -19,7 +19,6 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 from sklearn.model_selection import KFold, train_test_split, GridSearchCV, ShuffleSplit
 from sklearn.metrics import roc_auc_score
 import re
-import shap
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import export_graphviz
 import itertools as it
@@ -31,7 +30,6 @@ from sklearn.linear_model import LogisticRegression
 import sys
 from sklearn.preprocessing import LabelEncoder
 from catboost import CatBoostClassifier
-from optbinning import OptimalBinning
 from sklearn.metrics import f1_score
 from sklearn.feature_selection import chi2
 from sklearn.feature_selection import SelectKBest
