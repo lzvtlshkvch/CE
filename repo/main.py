@@ -565,3 +565,26 @@ def build_dnn(dim_0, dim_1, dim_2, activation_0, activation_1, activation_2, dro
     model.compile(loss=loss, optimizer=optimizer, metrics=['accuracy'])
 
     return model
+
+
+
+def describe_data_point(data_point_index, X, y, feature_names):
+    """Prints out a data point with the specified given index."""
+    dp_to_explain = X.values[data_point_index, :]
+    dp_to_explain_class_index = int(y[data_point_index])
+    dp_to_explain_class = np.array([0, 1])
+
+    feature_description_template = '    * {} (feature index {}): {:.1f}'
+    features_description = []
+    for i, name in enumerate(feature_names):
+        dsc = feature_description_template.format(name, i, dp_to_explain[i])
+        features_description.append(dsc)
+    features_description = ',\n'.join(features_description)
+
+    data_point_description = (
+        'Explaining data point (index {}) of class {} (class index {}) with '
+        'features:\n{}.'.format(data_point_index, dp_to_explain_class,
+                                dp_to_explain_class_index,
+                                features_description))
+
+    print(data_point_description)
