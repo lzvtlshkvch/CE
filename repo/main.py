@@ -46,7 +46,7 @@ def plot_categorical(df, target, var, ax):
   good = df[df[target]== 1][var].value_counts()
   bad  = df[df[target]== 0][var].value_counts()
   pd.DataFrame({'good' : good.sort_index(), 'bad' : bad.sort_index()}).plot.bar(stacked = False, ax = ax);
-  ax.set_title(var + f': {df[["credit_appr", var]].corr().iloc[0,1] :.3f}');
+  ax.set_title(var + f': {df[[target, var]].corr().iloc[0,1] :.3f}');
 
 def plot_continuous(df, target, var, ax):
   sns.kdeplot(data = df, x = var, hue=target, hue_order = [1,0], ax = ax)
