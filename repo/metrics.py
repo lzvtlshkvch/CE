@@ -429,9 +429,26 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         avg_nbr_violations_per_cf_ = avg_nbr_violations_per_cf(x, cf_list, variable_features)
         avg_nbr_violations_ = avg_nbr_violations(x, cf_list, variable_features)
 
-        plausibility_sum = plausibility(x, bb, cf_list, X_test, y_pred, continuous_features_all,
-                                        categorical_features_all, X_train, ratio_cont)
-        plausibility_max_nbr_cf_ = plausibility_sum / max_nbr_cf
+        sum_dist = 0.0
+        for cf in cf_list:
+            y_cf_val = bb.predict(cf.reshape(1, -1))[0]
+            X_test_y = X_test.values[y_cf_val == y_pred]
+            # neigh_dist = exp.cdist(x.reshape(1, -1), X_test_y)
+            neigh_dist = metrics.distance_mh(x.reshape(1, -1), X_test_y, continuous_features_all,
+                            categorical_features_all, X_train.values, ratio_cont)
+            idx_neigh = np.argsort(neigh_dist)[0]
+            # closest_idx = closest_idx = idx_neigh[0]
+            # closest = X_test_y[closest_idx]
+            closest = X_test_y[idx_neigh]
+            d = metrics.distance_mh(cf, closest.reshape(1, -1), continuous_features_all,
+                            categorical_features_all, X_train.values, ratio_cont)
+            sum_dist += d
+        
+        plausibility_sum = sum_dist
+        
+        # plausibility_sum = metrics.plausibility(x, bb, cf_list, X_test, y_val, continuous_features_all,
+        #                                         categorical_features_all, X_train, ratio_cont)
+        # plausibility_max_nbr_cf_ = plausibility_sum / max_nbr_cf
         plausibility_nbr_cf_ = plausibility_sum / nbr_cf_
         plausibility_nbr_valid_cf_ = plausibility_sum / nbr_valid_cf_ if nbr_valid_cf_ > 0 else plausibility_sum
         plausibility_nbr_actionable_cf_ = plausibility_sum / nbr_actionable_cf_ if nbr_actionable_cf_ > 0 else plausibility_sum
@@ -513,12 +530,12 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         count_diversity_cate_ = count_diversity(cf_list, categorical_features_all, nbr_features, continuous_features_all)
         count_diversity_all_ = count_diversity_all(cf_list, nbr_features, continuous_features_all)
 
-        accuracy_knn_sklearn_ = accuracy_knn_sklearn(x, cf_list, bb, X_test, continuous_features_all,
-                                                     categorical_features_all, scaler, test_size=5)
-        accuracy_knn_dist_ = accuracy_knn_dist(x, cf_list, bb, X_test, continuous_features_all,
-                                               categorical_features_all, scaler, test_size=5)
+        # accuracy_knn_sklearn_ = accuracy_knn_sklearn(x, cf_list, bb, X_test, continuous_features_all,
+        #                                              categorical_features_all, scaler, test_size=5)
+        # accuracy_knn_dist_ = accuracy_knn_dist(x, cf_list, bb, X_test, continuous_features_all,
+        #                                        categorical_features_all, scaler, test_size=5)
 
-        lof_ = lof(x, cf_list, X_train, scaler)
+        # lof_ = lof(x, cf_list, X_train, scaler)
 
         res = {
             'nbr_cf': nbr_cf_,
@@ -580,9 +597,9 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'count_diversity_cont': count_diversity_cont_,
             'count_diversity_cate': count_diversity_cate_,
             'count_diversity_all': count_diversity_all_,
-            'accuracy_knn_sklearn': accuracy_knn_sklearn_,
-            'accuracy_knn_dist': accuracy_knn_dist_,
-            'lof': lof_,
+            # 'accuracy_knn_sklearn': accuracy_knn_sklearn_,
+            # 'accuracy_knn_dist': accuracy_knn_dist_,
+            # 'lof': lof_,
 
             'delta': delta_,
             'delta_min': delta_min_,
@@ -651,9 +668,9 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'count_diversity_cont': np.nan,
             'count_diversity_cate': np.nan,
             'count_diversity_all': np.nan,
-            'accuracy_knn_sklearn': 0.0,
-            'accuracy_knn_dist': 0.0,
-            'lof': np.nan,
+            # 'accuracy_knn_sklearn': 0.0,
+            # 'accuracy_knn_dist': 0.0,
+            # 'lof': np.nan,
             'delta': 0.0,
             'delta_min': 0.0,
             'delta_max': 0.0,
@@ -682,336 +699,9 @@ columns = ['dataset',  'black_box', 'method', 'idx', 'k', 'known_train', 'search
            'diversity_mad_min', 'diversity_j_min', 'diversity_h_min', 'diversity_l2j_min', 'diversity_mh_min',
            'diversity_l2_max', 'diversity_mad_max', 'diversity_j_max', 'diversity_h_max', 'diversity_l2j_max',
            'diversity_mh_max', 'count_diversity_cont', 'count_diversity_cate', 'count_diversity_all',
-           'accuracy_knn_sklearn', 'accuracy_knn_dist', 'lof', 'delta', 'delta_min', 'delta_max', 'instability_si',
+           # 'accuracy_knn_sklearn', 'accuracy_knn_dist', 'lof', 
+           'delta', 'delta_min', 'delta_max', 'instability_si',
            'plausibility_sum', 'plausibility_max_nbr_cf', 'plausibility_nbr_cf', 'plausibility_nbr_valid_cf',
            'plausibility_nbr_actionable_cf', 'plausibility_nbr_valid_actionable_cf'
 ]
 
-
-
-
-
-def evaluate_only_plasubility(cf_list, x, bb, y_val, max_nbr_cf, variable_features, continuous_features_all,
-                     categorical_features_all, X_train, X_test, ratio_cont):
-    nbr_cf_ = len(cf_list)
-    if nbr_cf_ > 0:
-
-        y_pred = bb.predict(X_test)
-
-        nbr_valid_cf_ = nbr_valid_cf(cf_list, bb, y_val)
-        perc_valid_cf_ = perc_valid_cf(cf_list, bb, y_val, k=nbr_cf_)
-        perc_valid_cf_all_ = perc_valid_cf(cf_list, bb, y_val, k=max_nbr_cf)
-        nbr_actionable_cf_ = nbr_actionable_cf(x, cf_list, variable_features)
-        perc_actionable_cf_ = perc_actionable_cf(x, cf_list, variable_features, k=nbr_cf_)
-        perc_actionable_cf_all_ = perc_actionable_cf(x, cf_list, variable_features, k=max_nbr_cf)
-        nbr_valid_actionable_cf_ = nbr_valid_actionable_cf(x, cf_list, bb, y_val, variable_features)
-        perc_valid_actionable_cf_ = perc_valid_actionable_cf(x, cf_list, bb, y_val, variable_features, k=nbr_cf_)
-        perc_valid_actionable_cf_all_ = perc_valid_actionable_cf(x, cf_list, bb, y_val, variable_features,
-                                                                 k=max_nbr_cf)
-
-        sum_dist = 0.0
-        for cf in cf_list:
-            y_cf_val = bb.predict(cf.reshape(1, -1))[0]
-            X_test_y = X_test[y_cf_val == y_pred]
-            neigh_dist = distance_mh(x.reshape(1, -1), X_test_y, continuous_features_all,
-                                     categorical_features_all, X_train, ratio_cont)
-            idx_neigh = np.argsort(neigh_dist)[0]
-            closest = X_test_y[idx_neigh]
-            d = distance_mh(cf, closest.reshape(1, -1), continuous_features_all,
-                            categorical_features_all, X_train, ratio_cont)
-            sum_dist += d
-
-        plausibility_sum = sum_dist
-        plausibility_max_nbr_cf_ = sum_dist / max_nbr_cf
-        plausibility_nbr_cf_ = sum_dist / nbr_cf_
-        plausibility_nbr_valid_cf_ = sum_dist / nbr_valid_cf_ if nbr_valid_cf_ > 0 else sum_dist
-        plausibility_nbr_actionable_cf_ = sum_dist / nbr_actionable_cf_ if nbr_actionable_cf_ > 0 else sum_dist
-        plausibility_nbr_valid_actionable_cf_ = sum_dist / nbr_valid_actionable_cf_ if nbr_valid_actionable_cf_ > 0 else sum_dist
-    else:
-        nbr_valid_cf_ = 0.0
-        perc_valid_cf_ = 0.0
-        perc_valid_cf_all_ = 0.0
-        nbr_actionable_cf_ = 0.0
-        perc_actionable_cf_ = 0.0
-        perc_actionable_cf_all_ = 0.0
-        nbr_valid_actionable_cf_ = 0.0
-        perc_valid_actionable_cf_ = 0.0
-        perc_valid_actionable_cf_all_ = 0.0
-        plausibility_sum = 0.0
-        plausibility_max_nbr_cf_ = 0.0
-        plausibility_nbr_cf_ = 0.0
-        plausibility_nbr_valid_cf_ = 0.0
-        plausibility_nbr_actionable_cf_ = 0.0
-        plausibility_nbr_valid_actionable_cf_ = 0.0
-
-    res = {
-        'nbr_cf': nbr_cf_,
-        'nbr_valid_cf': nbr_valid_cf_,
-        'perc_valid_cf': perc_valid_cf_,
-        'perc_valid_cf_all': perc_valid_cf_all_,
-        'nbr_actionable_cf': nbr_actionable_cf_,
-        'perc_actionable_cf': perc_actionable_cf_,
-        'perc_actionable_cf_all': perc_actionable_cf_all_,
-        'nbr_valid_actionable_cf': nbr_valid_actionable_cf_,
-        'perc_valid_actionable_cf': perc_valid_actionable_cf_,
-        'perc_valid_actionable_cf_all': perc_valid_actionable_cf_all_,
-        'plausibility_sum': plausibility_sum,
-        'plausibility_max_nbr_cf': plausibility_max_nbr_cf_,
-        'plausibility_nbr_cf': plausibility_nbr_cf_,
-        'plausibility_nbr_valid_cf': plausibility_nbr_valid_cf_,
-        'plausibility_nbr_actionable_cf': plausibility_nbr_actionable_cf_,
-        'plausibility_nbr_valid_actionable_cf': plausibility_nbr_valid_actionable_cf_,
-    }
-
-    return res
-
-
-def plausibility_img_ts(x_true, x, bb, cf_true, cf_list, X_test, y_pred, X_train, continuous_features):
-    sum_dist = 0.0
-    for i, cf in enumerate(cf_true):
-        y_cf_val = bb.predict(cf.reshape((1,) + cf.shape))[0]
-        X_test_y = X_test[y_cf_val == y_pred]
-        neigh_dist = continuous_distance(x.reshape(1, -1), X_test_y, continuous_features, metric='mad', X=X_train)
-        idx_neigh = np.argsort(neigh_dist)[0]
-        closest = X_test_y[idx_neigh]
-        d = continuous_distance(cf_list[i], closest.reshape(1, -1), continuous_features, metric='mad', X=X_train)
-        sum_dist += d
-    return sum_dist
-
-
-def select_test_knn_img(x_true, x_flat, b, X_test, X_test_flat, test_size=5):
-    y_val = b.predict(x_true.reshape((1,) + x_true.shape))
-    y_test = b.predict(X_test)
-
-    dist_f = cdist(x_flat.reshape(1, -1), X_test_flat[y_test == y_val], metric='euclidean')
-    dist_cf = cdist(x_flat.reshape(1, -1), X_test_flat[y_test != y_val], metric='euclidean')
-
-    index_f = np.argsort(dist_f)[0][:test_size].tolist()
-    index_cf = np.argsort(dist_cf)[0][:test_size].tolist()
-
-    index = np.array(index_f + index_cf)
-
-    return X_test_flat[index], X_test[index]
-
-
-def accuracy_knn_sklearn_img_ts(x_true, x_flat, cf_list, b, X_test, X_test_flat, test_size=5):
-    clf = KNeighborsClassifier(n_neighbors=1)
-    X_train_true = np.vstack([x_true.reshape((1,) + x_true.shape), cf_list])
-    y_train = b.predict(X_train_true)
-    X_train_flat = np.array([x0.flatten() for x0 in X_train_true])
-    clf.fit(X_train_flat, y_train)
-
-    X_test_knn_flat, X_test_knn_true = select_test_knn_img(x_true, x_flat, b, X_test, X_test_flat, test_size)
-    y_test = b.predict(X_test_knn_true)
-    y_pred = clf.predict(X_test_knn_flat)
-
-    return accuracy_score(y_test, y_pred)
-
-
-def accuracy_knn_dist_img_ts(x_true, x_flat, cf_list_true, cf_list_flat, b, X_test_true, X_test_flat, test_size=5):
-    X_train_true = np.vstack([x_true.reshape((1,) + x_true.shape), cf_list_true])
-    X_train_flat = np.vstack([x_flat.reshape(1,-1), cf_list_flat])
-    y_train = b.predict(X_train_true)
-
-    X_test_knn_flat, X_test_knn_true = select_test_knn_img(x_true, x_flat, b, X_test_true, X_test_flat, test_size)
-    y_test = b.predict(X_test_knn_true)
-
-    y_pred = list()
-    for x_test in X_test_knn_flat:
-        dist = cdist(x_test.reshape(1, -1), X_train_flat, metric='euclidean')
-        idx = np.argmin(dist)
-        y_pred.append(y_train[idx])
-
-    return accuracy_score(y_test, y_pred)
-
-
-def evaluate_cf_list_img_ts(cf_list, x, bb, y_val, max_nbr_cf, variable_features, X_train, X_test, nbr_features,
-                            X_train_flat, X_test_flat):
-
-    nbr_cf_ = len(cf_list)
-
-    if nbr_cf_ > 0:
-        scaler = DummyScaler()
-        scaler.fit(X_train)
-
-        y_pred = bb.predict(X_test)
-
-        nbr_valid_cf_ = nbr_valid_cf(cf_list, bb, y_val)
-        perc_valid_cf_ = perc_valid_cf(cf_list, bb, y_val, k=nbr_cf_)
-        perc_valid_cf_all_ = perc_valid_cf(cf_list, bb, y_val, k=max_nbr_cf)
-        # nbr_actionable_cf_ = nbr_actionable_cf(x, cf_list, variable_features)
-        # perc_actionable_cf_ = perc_actionable_cf(x, cf_list, variable_features, k=nbr_cf_)
-        # perc_actionable_cf_all_ = perc_actionable_cf(x, cf_list, variable_features, k=max_nbr_cf)
-        # nbr_valid_actionable_cf_ = nbr_valid_actionable_cf(x, cf_list, bb, y_val, variable_features)
-        # perc_valid_actionable_cf_ = perc_valid_actionable_cf(x, cf_list, bb, y_val, variable_features, k=nbr_cf_)
-        # perc_valid_actionable_cf_all_ = perc_valid_actionable_cf(x, cf_list, bb, y_val, variable_features, k=max_nbr_cf)
-        x_flat = x.flatten()
-        cf_list_flat = np.array([cf.flatten() for cf in cf_list])
-        avg_nbr_violations_per_cf_ = avg_nbr_violations_per_cf(x_flat, cf_list_flat, variable_features)
-        avg_nbr_violations_ = avg_nbr_violations(x_flat, cf_list_flat, variable_features)
-
-        plausibility_sum = plausibility_img_ts(x, x_flat, bb, cf_list, cf_list_flat, X_test_flat, y_pred, X_train_flat,
-                                               variable_features)
-        plausibility_max_nbr_cf_ = plausibility_sum / max_nbr_cf
-        plausibility_nbr_cf_ = plausibility_sum / nbr_cf_
-        plausibility_nbr_valid_cf_ = plausibility_sum / nbr_valid_cf_ if nbr_valid_cf_ > 0 else plausibility_sum
-        # plausibility_nbr_actionable_cf_ = plausibility_sum / nbr_actionable_cf_ if nbr_actionable_cf_ > 0 else plausibility_sum
-        # plausibility_nbr_valid_actionable_cf_ = plausibility_sum / nbr_valid_actionable_cf_ if nbr_valid_actionable_cf_ > 0 else plausibility_sum
-
-        distance_l2_ = continuous_distance(x_flat, cf_list_flat, variable_features, metric='euclidean', X=None)
-        distance_mad_ = continuous_distance(x_flat, cf_list_flat, variable_features, metric='mad', X=X_train_flat)
-
-        distance_l2_min_ = continuous_distance(x_flat, cf_list_flat, variable_features, metric='euclidean',
-                                               X=None, agg='min')
-        distance_mad_min_ = continuous_distance(x_flat, cf_list_flat, variable_features, metric='mad',
-                                                X=X_train_flat, agg='min')
-
-        distance_l2_max_ = continuous_distance(x_flat, cf_list_flat, variable_features,
-                                               metric='euclidean', X=None, agg='max')
-        distance_mad_max_ = continuous_distance(x_flat, cf_list_flat, variable_features,
-                                                metric='mad', X=X_train_flat, agg='max')
-
-        avg_nbr_changes_per_cf_ = avg_nbr_changes_per_cf(x_flat, cf_list_flat, variable_features)
-        avg_nbr_changes_ = avg_nbr_changes(x_flat, cf_list_flat, nbr_features, variable_features)
-
-        delta_ = delta_proba_img_ts(x, cf_list, bb, agg='mean')
-        delta_min_ = delta_proba_img_ts(x, cf_list, bb, agg='min')
-        delta_max_ = delta_proba_img_ts(x, cf_list, bb, agg='max')
-
-        if len(cf_list) > 1:
-            diversity_l2_ = continuous_diversity(cf_list_flat, variable_features,
-                                                 metric='euclidean', X=None)
-            diversity_mad_ = continuous_diversity(cf_list_flat, variable_features, metric='mad',
-                                                  X=X_train_flat)
-            diversity_l2_min_ = continuous_diversity(cf_list_flat, variable_features,
-                                                     metric='euclidean', X=None, agg='min')
-            diversity_mad_min_ = continuous_diversity(cf_list_flat, variable_features,
-                                                      metric='mad', X=X_train_flat, agg='min')
-            diversity_l2_max_ = continuous_diversity(cf_list_flat, variable_features,
-                                                     metric='euclidean', X=None, agg='max')
-            diversity_mad_max_ = continuous_diversity(cf_list_flat, variable_features,
-                                                      metric='mad', X=X_train_flat, agg='max')
-
-        else:
-            diversity_l2_ = 0.0
-            diversity_mad_ = 0.0
-            diversity_l2_min_ = 0.0
-            diversity_mad_min_ = 0.0
-            diversity_l2_max_ = 0.0
-            diversity_mad_max_ = 0.0
-
-        count_diversity_ = count_diversity(cf_list_flat, variable_features, nbr_features, variable_features)
-
-        accuracy_knn_sklearn_ = accuracy_knn_sklearn_img_ts(x, x_flat, cf_list, bb, X_test, X_test_flat, test_size=5)
-        accuracy_knn_dist_ = accuracy_knn_dist_img_ts(x, x_flat, cf_list, cf_list_flat, bb, X_test, X_test_flat, test_size=5)
-
-        # lof_ = lof(x_flat, cf_list_flat, X_train_flat, scaler)
-
-        res = {
-            'nbr_cf': nbr_cf_,
-            'nbr_valid_cf': nbr_valid_cf_,
-            'perc_valid_cf': perc_valid_cf_,
-            'perc_valid_cf_all': perc_valid_cf_all_,
-            # 'nbr_actionable_cf': nbr_actionable_cf_,
-            # 'perc_actionable_cf': perc_actionable_cf_,
-            # 'perc_actionable_cf_all': perc_actionable_cf_all_,
-            # 'nbr_valid_actionable_cf': nbr_valid_actionable_cf_,
-            # 'perc_valid_actionable_cf': perc_valid_actionable_cf_,
-            # 'perc_valid_actionable_cf_all': perc_valid_actionable_cf_all_,
-            'avg_nbr_violations_per_cf': avg_nbr_violations_per_cf_,
-            'avg_nbr_violations': avg_nbr_violations_,
-            'distance_l2': distance_l2_,
-            'distance_mad': distance_mad_,
-            'avg_nbr_changes_per_cf': avg_nbr_changes_per_cf_,
-            'avg_nbr_changes': avg_nbr_changes_,
-
-            'distance_l2_min': distance_l2_min_,
-            'distance_mad_min': distance_mad_min_,
-            'distance_l2_max': distance_l2_max_,
-            'distance_mad_max': distance_mad_max_,
-            'diversity_l2': diversity_l2_,
-            'diversity_mad': diversity_mad_,
-
-            'diversity_l2_min': diversity_l2_min_,
-            'diversity_mad_min': diversity_mad_min_,
-            'diversity_l2_max': diversity_l2_max_,
-            'diversity_mad_max': diversity_mad_max_,
-
-            'count_diversity_': count_diversity_,
-            'accuracy_knn_sklearn': accuracy_knn_sklearn_,
-            'accuracy_knn_dist': accuracy_knn_dist_,
-            # 'lof': lof_,
-
-            'delta': delta_,
-            'delta_min': delta_min_,
-            'delta_max': delta_max_,
-
-            'plausibility_sum': plausibility_sum,
-            'plausibility_max_nbr_cf': plausibility_max_nbr_cf_,
-            'plausibility_nbr_cf': plausibility_nbr_cf_,
-            'plausibility_nbr_valid_cf': plausibility_nbr_valid_cf_,
-            # 'plausibility_nbr_actionable_cf': plausibility_nbr_actionable_cf_,
-            # 'plausibility_nbr_valid_actionable_cf': plausibility_nbr_valid_actionable_cf_,
-        }
-
-    else:
-        res = {
-            'nbr_cf': nbr_cf_,
-            'nbr_valid_cf': 0.0,
-            'perc_valid_cf': 0.0,
-            'perc_valid_cf_all': 0.0,
-            # 'nbr_actionable_cf': 0.0,
-            # 'perc_actionable_cf': 0.0,
-            # 'perc_actionable_cf_all': 0.0,
-            # 'nbr_valid_actionable_cf': 0.0,
-            # 'perc_valid_actionable_cf': 0.0,
-            # 'perc_valid_actionable_cf_all': 0.0,
-            'avg_nbr_violations_per_cf': np.nan,
-            'avg_nbr_violations': np.nan,
-            'distance_l2': np.nan,
-            'distance_mad': np.nan,
-            'avg_nbr_changes_per_cf': np.nan,
-            'avg_nbr_changes': np.nan,
-
-            'distance_l2_min': np.nan,
-            'distance_mad_min': np.nan,
-            'distance_l2_max': np.nan,
-            'distance_mad_max': np.nan,
-            'diversity_l2': np.nan,
-            'diversity_mad': np.nan,
-
-            'diversity_l2_min': np.nan,
-            'diversity_mad_min': np.nan,
-            'diversity_l2_max': np.nan,
-            'diversity_mad_max': np.nan,
-
-            'count_diversity_': np.nan,
-            'accuracy_knn_sklearn': 0.0,
-            'accuracy_knn_dist': 0.0,
-            # 'lof': np.nan,
-
-            'delta': 0.0,
-            'delta_min': 0.0,
-            'delta_max': 0.0,
-
-            'plausibility_sum': 0.0,
-            'plausibility_max_nbr_cf': 0.0,
-            'plausibility_nbr_cf': 0.0,
-            'plausibility_nbr_valid_cf': 0.0,
-            # 'plausibility_nbr_actionable_cf': 0.0,
-            # 'plausibility_nbr_valid_actionable_cf': 0.0,
-        }
-
-    return res
-
-
-columns_img_ts = ['dataset', 'black_box', 'method', 'idx', 'k',
-               'time_train', 'time_test', 'runtime',
-               'nbr_cf', 'nbr_valid_cf', 'perc_valid_cf', 'perc_valid_cf_all',
-               'avg_nbr_violations_per_cf', 'avg_nbr_violations',
-               'distance_l2', 'distance_mad', 'avg_nbr_changes_per_cf', 'avg_nbr_changes',
-               'distance_l2_min', 'distance_mad_min', 'distance_l2_max', 'distance_mad_max', 'diversity_l2',
-               'diversity_mad', 'diversity_l2_min', 'diversity_mad_min', 'diversity_l2_max', 'diversity_mad_max',
-               'count_diversity_', 'accuracy_knn_sklearn', 'accuracy_knn_dist', 'delta', 'delta_min', 'delta_max',
-               'plausibility_sum', 'plausibility_max_nbr_cf', 'plausibility_nbr_cf', 'plausibility_nbr_valid_cf',
-]
