@@ -432,16 +432,16 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         sum_dist = 0.0
         for cf in cf_list:
             y_cf_val = bb.predict(cf.reshape(1, -1))[0]
-            X_test_y = X_test.values[y_cf_val == y_pred]
+            X_test_y = X_test[y_cf_val == y_pred]
             # neigh_dist = exp.cdist(x.reshape(1, -1), X_test_y)
             neigh_dist = metrics.distance_mh(x.reshape(1, -1), X_test_y, continuous_features_all,
-                            categorical_features_all, X_train.values, ratio_cont)
+                            categorical_features_all, X_train, ratio_cont)
             idx_neigh = np.argsort(neigh_dist)[0]
             # closest_idx = closest_idx = idx_neigh[0]
             # closest = X_test_y[closest_idx]
             closest = X_test_y[idx_neigh]
             d = metrics.distance_mh(cf, closest.reshape(1, -1), continuous_features_all,
-                            categorical_features_all, X_train.values, ratio_cont)
+                            categorical_features_all, X_train, ratio_cont)
             sum_dist += d
         
         plausibility_sum = sum_dist
