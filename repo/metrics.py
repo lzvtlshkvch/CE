@@ -683,7 +683,7 @@ else:
         'plausibility_nbr_valid_actionable_cf': 0.0,
     }
 
-return res
+    return res
 
 columns = ['dataset',  'black_box', 'method', 'idx', 'k', 'known_train', 'search_diversity', 'metric',
         'time_train', 'time_test', 'runtime', 'variable_features_flag',
