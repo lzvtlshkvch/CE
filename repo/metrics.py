@@ -226,6 +226,9 @@ def continuous_diversity(cf_list, continuous_features, metric='euclidean', X=Non
 
     if agg == 'min':
         return np.min(dist)
+        
+    if agg == 'std':
+        return np.std(dist)
 
 
 def categorical_diversity(cf_list, categorical_features, metric='jaccard', agg=None):
@@ -240,6 +243,9 @@ def categorical_diversity(cf_list, categorical_features, metric='jaccard', agg=N
 
     if agg == 'min':
         return np.min(dist)
+        
+    if agg == 'std':
+        return np.std(dist)
 
 
 def diversity_l2j(cf_list, continuous_features, categorical_features, ratio_cont=None, agg=None):
@@ -376,6 +382,9 @@ def delta_proba(x, cf_list, b, agg=None):
     if agg == 'min':
         return np.min(deltas)
 
+    if agg == 'std':
+        return np.std(deltas)
+
 
 def delta_proba_img_ts(x, cf_list, b, agg=None):
     y_val = b.predict(x.reshape((1,) + x.shape))
@@ -435,6 +444,7 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         avg_nbr_violations_ = avg_nbr_violations(x, cf_list, variable_features)
     
         sum_dist = 0.0
+        plausibility_dict = []
         for cf in cf_list:
             y_cf_val = bb.predict(cf.reshape(1, -1))[0]
             X_test_y = X_test.values[y_cf_val == y_pred]
@@ -448,7 +458,8 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             d = distance_mh(cf, closest.reshape(1, -1), continuous_features_all,
                             categorical_features_all, X_train.values, ratio_cont)
             sum_dist += d
-        
+            plausibility_dict.append(d)
+        plausibility_std = np.std(plausibility_dict)
         plausibility_sum = sum_dist
         
         # plausibility_sum = metrics.plausibility(x, bb, cf_list, X_test, y_val, continuous_features_all,
@@ -479,6 +490,13 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         distance_h_max_ = categorical_distance(x, cf_list, categorical_features_all, metric='hamming', agg='max')
         distance_l2j_max_ = distance_l2j(x, cf_list, continuous_features_all, categorical_features_all, ratio_cont, agg='max')
         distance_mh_max_ = distance_mh(x, cf_list, continuous_features_all, categorical_features_all, X_train.values, ratio_cont, agg='max')
+        
+        distance_l2_std_ = continuous_distance(x, cf_list, continuous_features_all, metric='euclidean', X=None, agg='std')
+        distance_mad_std_ = continuous_distance(x, cf_list, continuous_features_all, metric='mad', X=X_train.values, agg='std')
+        distance_j_std_ = categorical_distance(x, cf_list, categorical_features_all, metric='jaccard', agg='std')
+        distance_h_std_ = categorical_distance(x, cf_list, categorical_features_all, metric='hamming', agg='std')
+        distance_l2j_std_ = distance_l2j(x, cf_list, continuous_features_all, categorical_features_all, ratio_cont, agg='std')
+        distance_mh_std_ = distance_mh(x, cf_list, continuous_features_all, categorical_features_all, X_train.values, ratio_cont, agg='std')
     
         avg_nbr_changes_per_cf_ = avg_nbr_changes_per_cf(x, cf_list, continuous_features_all)
         std_nbr_changes_per_cf_ = std_nbr_changes_per_cf(x, cf_list, continuous_features_all)
@@ -487,6 +505,7 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         delta_ = delta_proba(x, cf_list, bb, agg='mean')
         delta_min_ = delta_proba(x, cf_list, bb, agg='min')
         delta_max_ = delta_proba(x, cf_list, bb, agg='max')
+        delta_max_ = delta_proba(x, cf_list, bb, agg='std')
 
         if len(cf_list) > 1:
             diversity_l2_ = continuous_diversity(cf_list, continuous_features_all, metric='euclidean', X=None)
@@ -509,6 +528,13 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             diversity_h_max_ = categorical_diversity(cf_list, categorical_features_all, metric='hamming', agg='max')
             diversity_l2j_max_ = diversity_l2j(cf_list, continuous_features_all, categorical_features_all, ratio_cont, agg='max')
             diversity_mh_max_ = diversity_mh(cf_list, continuous_features_all, categorical_features_all, X_train.values, ratio_cont, agg='max')
+            
+            diversity_l2_std_ = continuous_diversity(cf_list, continuous_features_all, metric='euclidean', X=None, agg='std')
+            diversity_mad_std_ = continuous_diversity(cf_list, continuous_features_all, metric='mad', X=X_train.values, agg='std')
+            diversity_j_std_ = categorical_diversity(cf_list, categorical_features_all, metric='jaccard', agg='std')
+            diversity_h_std_ = categorical_diversity(cf_list, categorical_features_all, metric='hamming', agg='std')
+            diversity_l2j_std_ = diversity_l2j(cf_list, continuous_features_all, categorical_features_all, ratio_cont, agg='std')
+            diversity_mh_std_ = diversity_mh(cf_list, continuous_features_all, categorical_features_all, X_train.values, ratio_cont, agg='std')
     
         else:
             diversity_l2_ = 0.0
@@ -531,6 +557,13 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             diversity_h_max_ = 0.0
             diversity_l2j_max_ = 0.0
             diversity_mh_max_ = 0.0
+
+            diversity_l2_std_ = 0.0
+            diversity_mad_std_ = 0.0
+            diversity_j_std_ = 0.0
+            diversity_h_std_ = 0.0
+            diversity_l2j_std_ = 0.0
+            diversity_mh_std_ = 0.0
 
         count_diversity_cont_ = count_diversity(cf_list, continuous_features_all, nbr_features, continuous_features_all)
         count_diversity_cate_ = count_diversity(cf_list, categorical_features_all, nbr_features, continuous_features_all)
@@ -580,6 +613,13 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'distance_h_max': distance_h_max_,
             'distance_l2j_max': distance_l2j_max_,
             'distance_mh_max': distance_mh_max_,
+
+            'distance_l2_std': distance_l2_std_,
+            'distance_mad_std': distance_mad_std_,
+            'distance_j_std': distance_j_std_,
+            'distance_h_std': distance_h_std_,
+            'distance_l2j_std': distance_l2j_std_,
+            'distance_mh_std': distance_mh_std_,
         
             'diversity_l2': diversity_l2_,
             'diversity_mad': diversity_mad_,
@@ -601,6 +641,13 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'diversity_h_max': diversity_h_max_,
             'diversity_l2j_max': diversity_l2j_max_,
             'diversity_mh_max': diversity_mh_max_,
+
+            'diversity_l2_std': diversity_l2_std_,
+            'diversity_mad_std': diversity_mad_std_,
+            'diversity_j_std': diversity_j_std_,
+            'diversity_h_std': diversity_h_std_,
+            'diversity_l2j_std': diversity_l2j_std_,
+            'diversity_mh_std': diversity_mh_std_,
         
             'count_diversity_cont': count_diversity_cont_,
             'count_diversity_cate': count_diversity_cate_,
@@ -612,8 +659,10 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'delta': delta_,
             'delta_min': delta_min_,
             'delta_max': delta_max_,
+            'delta_std': delta_std_,
         
             'plausibility_sum': plausibility_sum,
+            'plausibility_std': plausibility_std,
             # 'plausibility_max_nbr_cf': plausibility_max_nbr_cf_,
             'plausibility_nbr_cf': plausibility_nbr_cf_,
             'plausibility_nbr_valid_cf': plausibility_nbr_valid_cf_,
@@ -634,6 +683,7 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'perc_valid_actionable_cf': 0.0,
             'perc_valid_actionable_cf_all': 0.0,
             'avg_nbr_violations_per_cf': np.nan,
+            'std_nbr_violations_per_cf': np.nan,
             'avg_nbr_violations': np.nan,
             'distance_l2': np.nan,
             'distance_mad': np.nan,
@@ -653,6 +703,12 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'distance_h_max': np.nan,
             'distance_l2j_max': np.nan,
             'distance_mh_max': np.nan,
+            'distance_l2_std': np.nan,
+            'distance_mad_std': np.nan,
+            'distance_j_std': np.nan,
+            'distance_h_std': np.nan,
+            'distance_l2j_std': np.nan,
+            'distance_mh_std': np.nan,
             'avg_nbr_changes_per_cf': np.nan,
             'std_nbr_changes_per_cf': np.nan,
             'avg_nbr_changes': np.nan,
@@ -674,6 +730,12 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'diversity_h_max': np.nan,
             'diversity_l2j_max': np.nan,
             'diversity_mh_max': np.nan,
+            'diversity_l2_std': np.nan,
+            'diversity_mad_std': np.nan,
+            'diversity_j_std': np.nan,
+            'diversity_h_std': np.nan,
+            'diversity_l2j_std': np.nan,
+            'diversity_mh_std': np.nan,
             'count_diversity_cont': np.nan,
             'count_diversity_cate': np.nan,
             'count_diversity_all': np.nan,
@@ -683,8 +745,10 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'delta': 0.0,
             'delta_min': 0.0,
             'delta_max': 0.0,
+            'delta_std': 0.0,
     
             'plausibility_sum': 0.0,
+            'plausibility_std': 0.0,
             'plausibility_max_nbr_cf': 0.0,
             'plausibility_nbr_cf': 0.0,
             'plausibility_nbr_valid_cf': 0.0,
@@ -698,17 +762,19 @@ columns = ['dataset',  'black_box', 'method', 'idx', 'k', 'known_train', 'search
         'time_train', 'time_test', 'runtime', 'variable_features_flag',
         'nbr_cf', 'nbr_valid_cf', 'perc_valid_cf', 'perc_valid_cf_all', 'nbr_actionable_cf', 'perc_actionable_cf',
         'perc_actionable_cf_all', 'nbr_valid_actionable_cf', 'perc_valid_actionable_cf',
-        'perc_valid_actionable_cf_all', 'avg_nbr_violations_per_cf', 'avg_nbr_violations',
+        'perc_valid_actionable_cf_all', 'avg_nbr_violations_per_cf', 'std_nbr_violations_per_cf', 'avg_nbr_violations',
         'distance_l2', 'distance_mad', 'distance_j', 'distance_h', 'distance_l2j', 'distance_mh',
         'distance_l2_min', 'distance_mad_min', 'distance_j_min', 'distance_h_min', 'distance_l2j_min',
         'distance_mh_min', 'distance_l2_max', 'distance_mad_max', 'distance_j_max', 'distance_h_max',
-        'distance_l2j_max', 'distance_mh_max', 'avg_nbr_changes_per_cf', 'avg_nbr_changes', 'diversity_l2',
+        'distance_l2j_max', 'distance_l2_std', 'distance_mad_std', 'distance_j_std', 'distance_h_std',
+        'distance_l2j_std', 'distance_mh_std', 'avg_nbr_changes_per_cf','std_nbr_changes_per_cf', 'avg_nbr_changes', 'diversity_l2',
         'diversity_mad', 'diversity_j', 'diversity_h', 'diversity_l2j', 'diversity_mh', 'diversity_l2_min',
         'diversity_mad_min', 'diversity_j_min', 'diversity_h_min', 'diversity_l2j_min', 'diversity_mh_min',
         'diversity_l2_max', 'diversity_mad_max', 'diversity_j_max', 'diversity_h_max', 'diversity_l2j_max',
-        'diversity_mh_max', 'count_diversity_cont', 'count_diversity_cate', 'count_diversity_all',
+        'diversity_mh_max', 'diversity_l2_std', 'diversity_mad_std', 'diversity_j_std', 'diversity_h_std', 'diversity_l2j_std',
+        'diversity_mh_std', 'count_diversity_cont', 'count_diversity_cate', 'count_diversity_all',
         # 'accuracy_knn_sklearn', 'accuracy_knn_dist', 'lof', 
-        'delta', 'delta_min', 'delta_max', 'instability_si',
-        'plausibility_sum', 'plausibility_max_nbr_cf', 'plausibility_nbr_cf', 'plausibility_nbr_valid_cf',
+        'delta', 'delta_min', 'delta_max', 'delta_std', 'instability_si',
+        'plausibility_sum','plausibility_std', 'plausibility_max_nbr_cf', 'plausibility_nbr_cf', 'plausibility_nbr_valid_cf',
         'plausibility_nbr_actionable_cf', 'plausibility_nbr_valid_actionable_cf'
 ]
