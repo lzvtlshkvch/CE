@@ -439,8 +439,8 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         nbr_valid_actionable_cf_ = nbr_valid_actionable_cf(x, cf_list, bb, y_val, variable_features)
         perc_valid_actionable_cf_ = perc_valid_actionable_cf(x, cf_list, bb, y_val, variable_features, k=nbr_cf_)
         perc_valid_actionable_cf_all_ = perc_valid_actionable_cf(x, cf_list, bb, y_val, variable_features, k=max_nbr_cf)
-        avg_nbr_violations_per_cf = avg_nbr_violations_per_cf(x, cf_list, variable_features)
-        std_nbr_violations_per_cf = std_nbr_violations_per_cf(x, cf_list, variable_features)
+        avg_nbr_violations_per_cf_ = avg_nbr_violations_per_cf(x, cf_list, variable_features)
+        std_nbr_violations_per_cf_ = std_nbr_violations_per_cf(x, cf_list, variable_features)
         avg_nbr_violations_ = avg_nbr_violations(x, cf_list, variable_features)
     
         sum_dist = 0.0
