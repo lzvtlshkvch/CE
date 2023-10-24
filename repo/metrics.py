@@ -140,6 +140,9 @@ def continuous_distance(x, cf_list, continuous_features, metric='euclidean', X=N
     if agg == 'min':
         return np.min(dist)
 
+    if agg == 'std':
+        return np.std(dist)
+
 
 def categorical_distance(x, cf_list, categorical_features, metric='jaccard', agg=None):
 
@@ -153,6 +156,9 @@ def categorical_distance(x, cf_list, categorical_features, metric='jaccard', agg
 
     if agg == 'min':
         return np.min(dist)
+    
+    if agg == 'std':
+        return np.std(dist)
 
 
 def distance_l2j(x, cf_list, continuous_features, categorical_features, ratio_cont=None, agg=None):
