@@ -102,6 +102,8 @@ def nbr_violations_per_cf(x, cf_list, variable_features):
 def avg_nbr_violations_per_cf(x, cf_list, variable_features):
     return np.mean(nbr_violations_per_cf(x, cf_list, variable_features))
 
+def std_nbr_violations_per_cf(x, cf_list, variable_features):
+    return np.std(nbr_violations_per_cf(x, cf_list, variable_features))
 
 def avg_nbr_violations(x, cf_list, variable_features):
     val = np.sum(nbr_violations_per_cf(x, cf_list, variable_features))
@@ -194,6 +196,9 @@ def nbr_changes_per_cf(x, cf_list, continuous_features):
 
 def avg_nbr_changes_per_cf(x, cf_list, continuous_features):
     return np.mean(nbr_changes_per_cf(x, cf_list, continuous_features))
+    
+def std_nbr_changes_per_cf(x, cf_list, continuous_features):
+    return np.std(nbr_changes_per_cf(x, cf_list, continuous_features))
 
 
 def avg_nbr_changes(x, cf_list, nbr_features, continuous_features):
@@ -425,7 +430,8 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         nbr_valid_actionable_cf_ = nbr_valid_actionable_cf(x, cf_list, bb, y_val, variable_features)
         perc_valid_actionable_cf_ = perc_valid_actionable_cf(x, cf_list, bb, y_val, variable_features, k=nbr_cf_)
         perc_valid_actionable_cf_all_ = perc_valid_actionable_cf(x, cf_list, bb, y_val, variable_features, k=max_nbr_cf)
-        avg_nbr_violations_per_cf_ = avg_nbr_violations_per_cf(x, cf_list, variable_features)
+        avg_nbr_violations_per_cf = avg_nbr_violations_per_cf(x, cf_list, variable_features)
+        std_nbr_violations_per_cf = std_nbr_violations_per_cf(x, cf_list, variable_features)
         avg_nbr_violations_ = avg_nbr_violations(x, cf_list, variable_features)
     
         sum_dist = 0.0
@@ -475,6 +481,7 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         distance_mh_max_ = distance_mh(x, cf_list, continuous_features_all, categorical_features_all, X_train.values, ratio_cont, agg='max')
     
         avg_nbr_changes_per_cf_ = avg_nbr_changes_per_cf(x, cf_list, continuous_features_all)
+        std_nbr_changes_per_cf_ = std_nbr_changes_per_cf(x, cf_list, continuous_features_all)
         avg_nbr_changes_ = avg_nbr_changes(x, cf_list, nbr_features, continuous_features_all)
     
         delta_ = delta_proba(x, cf_list, bb, agg='mean')
@@ -548,6 +555,7 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'perc_valid_actionable_cf': perc_valid_actionable_cf_,
             'perc_valid_actionable_cf_all': perc_valid_actionable_cf_all_,
             'avg_nbr_violations_per_cf': avg_nbr_violations_per_cf_,
+            'std_nbr_violations_per_cf': std_nbr_violations_per_cf_,
             'avg_nbr_violations': avg_nbr_violations_,
             'distance_l2': distance_l2_,
             'distance_mad': distance_mad_,
@@ -556,6 +564,7 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'distance_l2j': distance_l2j_,
             'distance_mh': distance_mh_,
             'avg_nbr_changes_per_cf': avg_nbr_changes_per_cf_,
+            'std_nbr_changes_per_cf': std_nbr_changes_per_cf_,
             'avg_nbr_changes': avg_nbr_changes_,
         
             'distance_l2_min': distance_l2_min_,
@@ -645,6 +654,7 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'distance_l2j_max': np.nan,
             'distance_mh_max': np.nan,
             'avg_nbr_changes_per_cf': np.nan,
+            'std_nbr_changes_per_cf': np.nan,
             'avg_nbr_changes': np.nan,
             'diversity_l2': np.nan,
             'diversity_mad': np.nan,
