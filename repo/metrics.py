@@ -511,7 +511,7 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         delta_ = delta_proba(x, cf_list, bb, agg='mean')
         delta_min_ = delta_proba(x, cf_list, bb, agg='min')
         delta_max_ = delta_proba(x, cf_list, bb, agg='max')
-        delta_max_ = delta_proba(x, cf_list, bb, agg='std')
+        delta_std_ = delta_proba(x, cf_list, bb, agg='std')
 
         if len(cf_list) > 1:
             diversity_l2_ = continuous_diversity(cf_list, continuous_features_all, metric='euclidean', X=None)
