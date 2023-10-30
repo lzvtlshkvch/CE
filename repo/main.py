@@ -584,7 +584,7 @@ def metrics_clf_cross_val(model, X, y, i, name, all_ginis, kfold):
   FPR_train = FP/(FP+TN)
   FNR_train = FN/(TP+FN)
 
-  auc_c_v = cross_val_score(model, X, y, cv=kfold, scoring=scoring)
+  auc_c_v = cross_val_score(model, X, y, cv=kfold, scoring='roc_auc')
         
   all_ginis.loc[i] = [name, CalcGini(y, preds_train),\
                       roc_auc_score(y, preds_train),\
