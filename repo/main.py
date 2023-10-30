@@ -16,7 +16,7 @@ import warnings
 from scipy import stats
 import random
 from statsmodels.stats.outliers_influence import variance_inflation_factor
-from sklearn.model_selection import KFold, train_test_split, GridSearchCV, ShuffleSplit
+from sklearn.model_selection import KFold, train_test_split, GridSearchCV, ShuffleSplit, cross_val_score, StratifiedKFold
 from sklearn.metrics import roc_auc_score
 import re
 from sklearn.ensemble import RandomForestClassifier
