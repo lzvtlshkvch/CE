@@ -575,7 +575,7 @@ def metrics_clf_cross_val(model, X, y, i, name, all_ginis, kfold):
   else:
     preds_train = model.predict_proba(X)[:,1]
   
-  cm = confusion_matrix(y_train, [1 if i > 0.5 else 0 for i in preds_train])
+  cm = confusion_matrix(y, [1 if i > 0.5 else 0 for i in preds_train])
   TP = cm[0][0]
   FP = cm[0][1]
   FN = cm[1][0]
