@@ -567,6 +567,29 @@ def metrics_clf(model, X_train, X_test, y_train, y_test, i, name, all_ginis):
                       f1_score([1 if i > 0.5 else 0 for i in preds_train], y_train),
                       f1_score([1 if i > 0.5 else 0 for i in preds_test], y_test),
                      FPR_train, FNR_train, FPR_test, FNR_test]
+
+
+def metrics_clf_cross_val(model, X, y, i, name, all_ginis, kfold):
+  if name == 'DNN':
+    preds_train = model.predict(X).reshape(1, -1)[0]
+  else:
+    preds_train = model.predict_proba(X)[:,1]
+  
+  cm = confusion_matrix(y_train, [1 if i > 0.5 else 0 for i in preds_train])
+  TP = cm[0][0]
+  FP = cm[0][1]
+  FN = cm[1][0]
+  TN = cm[1][1]
+  
+  FPR_train = FP/(FP+TN)
+  FNR_train = FN/(TP+FN)
+
+  auc_c_v = cross_val_score(model, X, y, cv=kfold, scoring=scoring)
+  all_ginis.loc[i] = [name, CalcGini(y, preds_train),\
+                      roc_auc_score(y, preds_train),\
+                      auc_c_v.mean(), auc_c_v.std(),\ 
+                      f1_score([1 if i > 0.5 else 0 for i in preds_train], y),
+                     FPR_train, FNR_train]
   
   
 logboard = TensorBoard(log_dir='.logs', histogram_freq=0, write_graph=True, write_images=False, update_freq='epoch')
