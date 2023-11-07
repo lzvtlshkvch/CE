@@ -640,3 +640,17 @@ def describe_data_point(data_point_index, X, y, feature_names):
                                 features_description))
 
     print(data_point_description)
+
+
+def detect_outliers(data, factors):
+    Q1 = data.quantile(0.25)
+    Q3 = data.quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - factors * IQR
+    upper_bound = Q3 + factors * IQR
+
+    outliers = ((data < lower_bound) | (data > upper_bound)).any(axis=1)
+    
+    outlier_indexes = data[outliers].index
+
+    return outlier_indexes
