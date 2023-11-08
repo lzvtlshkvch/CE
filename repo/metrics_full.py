@@ -8,6 +8,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import LocalOutlierFactor
 
+
 class DummyScaler:
 
     def __init__(self):
@@ -428,6 +429,11 @@ def plausibility(x, bb, cf_list, X_test, y_pred, continuous_features_all,
 
 def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, continuous_features_all,
                      categorical_features_all, X_train, X_test, ratio_cont, nbr_features):
+                         
+    scaler = StandardScaler()
+    scaler.fit(X)
+    # scaler.transform([x])[0]
+                         
     nbr_cf_ = len(cf_list)
 
     if nbr_cf_ > 0:
