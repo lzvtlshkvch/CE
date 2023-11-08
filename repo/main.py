@@ -654,3 +654,10 @@ def detect_outliers(data, factors):
     outlier_indexes = data[outliers].index
 
     return outlier_indexes
+
+def immutable_data(example):
+  d = {}
+  for c in immutable_variables + mutable_variables_2:   # including difficult to mutate features too
+    d[c] = [example[c]]
+  d[TARGET] = [1]
+  return pd.DataFrame(data = d)
