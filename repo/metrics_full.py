@@ -374,7 +374,6 @@ def lof(x, cf_list, X, scaler):
     lof_values = clf.predict(ncf_list)
     return np.mean(np.abs(lof_values))
 
-
 # differenza in predict proba con x -> piu alto e' megliio
 def delta_proba(x, cf_list, b, agg=None):
     y_val = b.predict(x.reshape(1, -1))
@@ -427,7 +426,29 @@ def plausibility(x, bb, cf_list, X_test, y_pred, continuous_features_all,
         sum_dist += d
     return sum_dist
 
+def plausibility_domain(cf_list, X_test, X_train, variable_features):
+    nbr_plausibility = 0
+    for var in variable_features:
+        min_var = X_train.iloc[:, var].min()
+        max_var = X_train.iloc[:, var].max()
+        # if (cf_list[:, var] >= min_var) & (cf_list[:, var] <= max_var):
+        if (cf_list[var] >= min_var) & (cf_list[var] <= max_var):
+            nbr_plausibility+=1
+    return nbr_plausibility/len(variable_features)
 
+def plausibility_lof(x, cf_list, X, scaler):
+    # X_train = np.vstack([x.reshape(1, -1), X])
+    X_train = X.copy()
+    nX_train = scaler.transform(X_train)
+    ncf_list = scaler.transform(cf_list)
+
+    clf = LocalOutlierFactor(n_neighbors=3, novelty=True)
+    clf.fit(nX_train)
+
+    lof_values = clf.predict(ncf_list)
+    # lof_values_nof = clf.negative_outlier_factor_
+    return np.mean(np.abs(lof_values)), lof_values
+    
 def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, continuous_features_all,
                      categorical_features_all, X_train, X_test, ratio_cont, nbr_features):
                          
