@@ -7,6 +7,7 @@ from scipy.stats import median_abs_deviation
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import LocalOutlierFactor
+from sklearn.preprocessing import StandardScaler
 
 
 class DummyScaler:
