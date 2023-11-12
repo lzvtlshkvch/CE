@@ -7,6 +7,8 @@ from scipy.stats import median_abs_deviation
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neighbors import LocalOutlierFactor
+from sklearn.preprocessing import StandardScaler
+
 
 class DummyScaler:
 
@@ -372,7 +374,6 @@ def lof(x, cf_list, X, scaler):
     lof_values = clf.predict(ncf_list)
     return np.mean(np.abs(lof_values))
 
-
 # differenza in predict proba con x -> piu alto e' megliio
 def delta_proba(x, cf_list, b, agg=None):
     y_val = b.predict(x.reshape(1, -1))
@@ -425,14 +426,41 @@ def plausibility(x, bb, cf_list, X_test, y_pred, continuous_features_all,
         sum_dist += d
     return sum_dist
 
+def plausibility_domain(cf_list, X_test, X_train, variable_features):
+    nbr_plausibility = 0
+    for var in variable_features:
+        min_var = X_train.iloc[:, var].min()
+        max_var = X_train.iloc[:, var].max()
+        # if (cf_list[:, var] >= min_var) & (cf_list[:, var] <= max_var):
+        if (cf_list[var] >= min_var) & (cf_list[var] <= max_var):
+            nbr_plausibility+=1
+    return nbr_plausibility/len(variable_features)
 
+def plausibility_lof(x, cf_list, X, scaler):
+    # X_train = np.vstack([x.reshape(1, -1), X])
+    X_train = X.copy()
+    nX_train = scaler.transform(X_train)
+    ncf_list = scaler.transform(cf_list)
+
+    clf = LocalOutlierFactor(n_neighbors=3, novelty=True)
+    clf.fit(nX_train)
+
+    lof_values = clf.predict(ncf_list)
+    # lof_values_nof = clf.negative_outlier_factor_
+    return np.mean(np.abs(lof_values)), lof_values
+    
 def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, continuous_features_all,
                      categorical_features_all, X_train, X_test, ratio_cont, nbr_features):
+                         
+    scaler = StandardScaler()
+    scaler.fit(X)
+    # scaler.transform([x])[0]
+                         
     nbr_cf_ = len(cf_list)
 
     if nbr_cf_ > 0:
-        # scaler = DummyScaler()
-        # scaler.fit(X_train)
+        scaler = DummyScaler()
+        scaler.fit(X_train)
     
         y_pred = bb.predict(X_test)
     
@@ -575,12 +603,12 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
         count_diversity_cate_ = count_diversity(cf_list, categorical_features_all, nbr_features, continuous_features_all)
         count_diversity_all_ = count_diversity_all(cf_list, nbr_features, continuous_features_all)
 
-        # accuracy_knn_sklearn_ = accuracy_knn_sklearn(x, cf_list, bb, X_test, continuous_features_all,
-        #                                              categorical_features_all, scaler, test_size=5)
-        # accuracy_knn_dist_ = accuracy_knn_dist(x, cf_list, bb, X_test, continuous_features_all,
-        #                                        categorical_features_all, scaler, test_size=5)
+        accuracy_knn_sklearn_ = accuracy_knn_sklearn(x, cf_list, bb, X_test, continuous_features_all,
+                                                     categorical_features_all, scaler, test_size=5)
+        accuracy_knn_dist_ = accuracy_knn_dist(x, cf_list, bb, X_test, continuous_features_all,
+                                               categorical_features_all, scaler, test_size=5)
         
-        # lof_ = lof(x, cf_list, X_train, scaler)
+        lof_ = lof(x, cf_list, X_train, scaler)
 
         res = {
             'nbr_cf': nbr_cf_,
@@ -658,9 +686,9 @@ def evaluate_cf_list(cf_list, x, bb, y_val, max_nbr_cf, variable_features, conti
             'count_diversity_cont': count_diversity_cont_,
             'count_diversity_cate': count_diversity_cate_,
             'count_diversity_all': count_diversity_all_,
-            # 'accuracy_knn_sklearn': accuracy_knn_sklearn_,
-            # 'accuracy_knn_dist': accuracy_knn_dist_,
-            # 'lof': lof_,
+            'accuracy_knn_sklearn': accuracy_knn_sklearn_,
+            'accuracy_knn_dist': accuracy_knn_dist_,
+            'lof': lof_,
         
             'delta': delta_,
             'delta_min': delta_min_,
@@ -779,7 +807,7 @@ columns = ['dataset',  'black_box', 'method', 'idx', 'k', 'known_train', 'search
         'diversity_l2_max', 'diversity_mad_max', 'diversity_j_max', 'diversity_h_max', 'diversity_l2j_max',
         'diversity_mh_max', 'diversity_l2_std', 'diversity_mad_std', 'diversity_j_std', 'diversity_h_std', 'diversity_l2j_std',
         'diversity_mh_std', 'count_diversity_cont', 'count_diversity_cate', 'count_diversity_all',
-        # 'accuracy_knn_sklearn', 'accuracy_knn_dist', 'lof', 
+        'accuracy_knn_sklearn', 'accuracy_knn_dist', 'lof', 
         'delta', 'delta_min', 'delta_max', 'delta_std', 'instability_si',
         'plausibility_sum','plausibility_std', 'plausibility_max_nbr_cf', 'plausibility_nbr_cf', 'plausibility_nbr_valid_cf',
         'plausibility_nbr_actionable_cf', 'plausibility_nbr_valid_actionable_cf'
