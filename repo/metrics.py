@@ -116,9 +116,10 @@ def diversity_l2(cf_list, continuous_features, metric='euclidean', X=None, agg=N
     else:
         dist = pdist(cf_list[:, continuous_features], metric=metric)
 
-    if agg is None or agg == 'mean':
+    if agg is None:
+        return dist
+    if agg == 'mean':
         return np.mean(dist)
-
     if agg == 'max':
         return np.max(dist)
 
