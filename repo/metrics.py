@@ -124,13 +124,13 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
         y_pred = model.predict(X)
         
         validity = nbr_valid_cf(cf_list, model, y_val, y_desidered=None)
-        proximity = distance_l2(x, cf_list, continuous_features_all, metric='euclidean', scaler, X=None)
+        proximity = distance_l2(x, cf_list, continuous_features_all, metric='euclidean', scaler=scaler, X=None)
         sparsity = nbr_changes_per_cf(x, cf_list, variable_features)
         plausibility_domain = plausibility_domain(cf_list, X, variable_features)
         plausibility_lof = plausibility_lof(x, cf_list, X, variable_features, scaler)
         
         if len(cf_list) > 1:
-            diversity = diversity_l2(cf_list, continuous_features, metric='euclidean', scaler, X=None, agg=None)
+            diversity = diversity_l2(cf_list, continuous_features, metric='euclidean', scaler=scaler, X=None, agg=None)
             validity_mean = validity.mean()
             validity_std = validity.std()
             proximity_mean = proximity.mean()
