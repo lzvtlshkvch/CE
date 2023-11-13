@@ -105,7 +105,7 @@ def plausibility_lof(x, cf_list, X, variable_features, scaler):
         clf.fit(np.vstack(nX[:, var]))
         lof_values.append(clf.predict(np.vstack(ncf_list[:, var])))
     nbr_plausibility = np.array(lof_values)
-    nbr_plausibility = [(nbr_plausibility[:,i] < 0).count() for i in range(len(cf_list))]
+    nbr_plausibility = [(nbr_plausibility[:,i] < 0).sum() for i in range(len(cf_list))]
     return nbr_plausibility
     
 def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_features,
