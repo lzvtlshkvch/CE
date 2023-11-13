@@ -192,25 +192,25 @@ def distance_mh(x, cf_list, continuous_features, categorical_features, X, ratio_
 
 
 # basso e' meglio cambi con x
-def nbr_changes_per_cf(x, cf_list, continuous_features):
+def nbr_changes_per_cf(x, cf_list, variable_features):
     nbr_features = cf_list.shape[1]
     nbr_changes = np.zeros(len(cf_list))
     for i, cf in enumerate(cf_list):
         for j in range(nbr_features):
             if cf[j] != x[j]:
-                nbr_changes[i] += 1 if j in continuous_features else 0.5
+                nbr_changes[i] += 1 if j in variable_features else 0.5
     return nbr_changes
 
 
-def avg_nbr_changes_per_cf(x, cf_list, continuous_features):
-    return np.mean(nbr_changes_per_cf(x, cf_list, continuous_features))
+def avg_nbr_changes_per_cf(x, cf_list, variable_features):
+    return np.mean(nbr_changes_per_cf(x, cf_list, variable_features))
     
-def std_nbr_changes_per_cf(x, cf_list, continuous_features):
-    return np.std(nbr_changes_per_cf(x, cf_list, continuous_features))
+def std_nbr_changes_per_cf(x, cf_list, variable_features):
+    return np.std(nbr_changes_per_cf(x, cf_list, variable_features))
 
 
-def avg_nbr_changes(x, cf_list, nbr_features, continuous_features):
-    val = np.sum(nbr_changes_per_cf(x, cf_list, continuous_features))
+def avg_nbr_changes(x, cf_list, nbr_features, variable_features):
+    val = np.sum(nbr_changes_per_cf(x, cf_list, variable_features))
     nbr_cf, _ = cf_list.shape
     return val / (nbr_cf * nbr_features)
 
