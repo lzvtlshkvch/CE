@@ -92,7 +92,10 @@ def distance_l2(x, cf_list, continuous_features, metric='euclidean', X=None, agg
     else:
         dist = cdist(x.reshape(1, -1)[:, continuous_features], cf_list[:, continuous_features], metric=metric)
 
-    if agg is None or agg == 'mean':
+    if agg is None:
+        return dist
+        
+    if agg == 'mean':
         return np.mean(dist)
 
     if agg == 'max':
@@ -118,8 +121,10 @@ def diversity_l2(cf_list, continuous_features, metric='euclidean', X=None, agg=N
 
     if agg is None:
         return dist
+        
     if agg == 'mean':
         return np.mean(dist)
+        
     if agg == 'max':
         return np.max(dist)
 
