@@ -56,7 +56,7 @@ def distance_l2(x, cf_list, continuous_features, metric='euclidean', scaler=None
       return np.nan
         
 
-def diversity_l2(cf_list, continuous_features, metric='euclidean', scaler, X=None, agg=None):
+def diversity_l2(cf_list, continuous_features, metric='euclidean', scaler=None, X=None, agg=None):
     if scaler is not None:
         ncf_list = scaler.transform(cf_list)
         dist = pdist(ncf_list[:, continuous_features], metric=metric)
