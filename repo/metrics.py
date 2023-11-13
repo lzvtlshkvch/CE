@@ -20,49 +20,7 @@ def perc_valid_cf(cf_list, b, y_val, k=None, y_desidered=None):
     n_val = nbr_valid_cf(cf_list, b, y_val, y_desidered)
     k = len(cf_list) if k is None else k
     res = n_val / k
-    return res
-
-def continuous_distance(x, cf_list, continuous_features, metric='euclidean', X=None, agg=None):
-
-    if metric == 'mad':
-        mad = median_abs_deviation(X[:, continuous_features], axis=0)
-        mad = np.array([v if v != 0 else 1.0 for v in mad])
-
-        def _mad_cityblock(u, v):
-            return mad_cityblock(u, v, mad)
-        dist = cdist(x.reshape(1, -1)[:, continuous_features], cf_list[:, continuous_features], metric=_mad_cityblock)
-    else:
-        dist = cdist(x.reshape(1, -1)[:, continuous_features], cf_list[:, continuous_features], metric=metric)
-
-    if agg is None or agg == 'mean':
-        return np.mean(dist)
-
-    if agg == 'max':
-        return np.max(dist)
-
-    if agg == 'min':
-        return np.min(dist)
-
-    if agg == 'std':
-        return np.std(dist)
-
-
-def categorical_distance(x, cf_list, categorical_features, metric='jaccard', agg=None):
-
-    dist = cdist(x.reshape(1, -1)[:, categorical_features], cf_list[:, categorical_features], metric=metric)
-
-    if agg is None or agg == 'mean':
-        return np.mean(dist)
-
-    if agg == 'max':
-        return np.max(dist)
-
-    if agg == 'min':
-        return np.min(dist)
-    
-    if agg == 'std':
-        return np.std(dist)
-
+    return res        
 
 def nbr_changes_per_cf(x, cf_list, variable_features):
     nbr_features = cf_list.shape[1]
@@ -73,53 +31,52 @@ def nbr_changes_per_cf(x, cf_list, variable_features):
                 nbr_changes[i] += 1 if j in variable_features else 0.5
     return nbr_changes
 
+def distance_l2(x, cf_list, continuous_features, metric='euclidean', scaler=None, X=None, agg=None):
+    if scaler is not None:
+      nx = scaler.transform(x)
+      ncf_list = scaler.transform(cf_list)
+      
+      dist = cdist(nx.reshape(1, -1)[:, continuous_features], ncf_list[:, continuous_features], metric=metric)
 
-def avg_nbr_changes_per_cf(x, cf_list, variable_features):
-    return np.mean(nbr_changes_per_cf(x, cf_list, variable_features))
-    
-def std_nbr_changes_per_cf(x, cf_list, variable_features):
-    return np.std(nbr_changes_per_cf(x, cf_list, variable_features))
+      if agg is None:
+          return dist
+          
+      if agg == 'mean':
+          return np.mean(dist)
 
-def distance_l2(x, cf_list, continuous_features, metric='euclidean', scaler, X=None, agg=None):
-    nx = scaler.transform(x)
-    ncf_list = scaler.transform(cf_list)
-    
-    dist = cdist(nx.reshape(1, -1)[:, continuous_features], ncf_list[:, continuous_features], metric=metric)
+      if agg == 'max':
+          return np.max(dist)
 
-    if agg is None:
-        return dist
-        
-    if agg == 'mean':
-        return np.mean(dist)
+      if agg == 'min':
+          return np.min(dist)
 
-    if agg == 'max':
-        return np.max(dist)
-
-    if agg == 'min':
-        return np.min(dist)
-
-    if agg == 'std':
-        return np.std(dist)
+      if agg == 'std':
+          return np.std(dist)
+    else:
+      return np.nan
         
 
 def diversity_l2(cf_list, continuous_features, metric='euclidean', scaler, X=None, agg=None):
-    ncf_list = scaler.transform(cf_list)
-    dist = pdist(ncf_list[:, continuous_features], metric=metric)
-
-    if agg is None:
-        return np.linalg.det(squareform(1/(dist+1)))
-        
-    if agg == 'mean':
-        return np.mean(dist)
-        
-    if agg == 'max':
-        return np.max(dist)
-
-    if agg == 'min':
-        return np.min(dist)
-        
-    if agg == 'std':
-        return np.std(dist)
+    if scaler is not None:
+        ncf_list = scaler.transform(cf_list)
+        dist = pdist(ncf_list[:, continuous_features], metric=metric)
+    
+        if agg is None:
+            return np.linalg.det(squareform(1/(dist+1)))
+            
+        if agg == 'mean':
+            return np.mean(dist)
+            
+        if agg == 'max':
+            return np.max(dist)
+    
+        if agg == 'min':
+            return np.min(dist)
+            
+        if agg == 'std':
+            return np.std(dist)
+    else:
+        return np.nan
 
 def plausibility_domain(cf_list, X, variable_features):
     nbr_plausibility = []
