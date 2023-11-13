@@ -134,10 +134,10 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
             proximity_std = proximity_.std()
             sparsity_mean = sparsity_.mean()
             sparsity_std = sparsity_.std()
-            plausibility_domain_mean = plausibility_domain_.mean()
-            plausibility_domain_std =  plausibility_domain_.std()
-            plausibility_lof_mean = plausibility_lof_.mean()
-            plausibility_lof_std =  plausibility_lof_.std()
+            plausibility_domain_mean = np.mean(plausibility_domain_)
+            plausibility_domain_std = np.std(plausibility_domain_)
+            plausibility_lof_mean = np.mean(plausibility_lof_)
+            plausibility_lof_std =  np.mean(plausibility_lof_)
         else:
             diversity_ = 0.0
             validity_mean = 0.0
