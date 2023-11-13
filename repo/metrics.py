@@ -117,10 +117,7 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
                          
     nbr_cf_ = len(cf_list)
 
-    if nbr_cf_ > 0:
-        scaler = DummyScaler()
-        scaler.fit(X_train)
-    
+    if nbr_cf_ > 0:    
         y_pred = model.predict(X)
         
         validity = nbr_valid_cf(cf_list, model, y_val, y_desidered=None)
