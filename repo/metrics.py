@@ -33,7 +33,7 @@ def nbr_changes_per_cf(x, cf_list, variable_features):
 
 def distance_l2(x, cf_list, continuous_features, metric='euclidean', scaler=None, X=None, agg=None):
     if scaler is not None:
-      nx = scaler.transform(x)
+      nx = scaler.transform([x])[0]
       ncf_list = scaler.transform(cf_list)
       
       dist = cdist(nx.reshape(1, -1)[:, continuous_features], ncf_list[:, continuous_features], metric=metric)
