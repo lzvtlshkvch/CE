@@ -36,7 +36,7 @@ def distance_l2(x, cf_list, continuous_features, metric='euclidean', scaler=None
       nx = scaler.transform([x])[0]
       ncf_list = scaler.transform(cf_list)
       
-      dist = cdist(nx.reshape(1, -1)[:, continuous_features], ncf_list[:, continuous_features], metric=metric)
+      dist = cdist(nx.reshape(1, -1)[:, continuous_features], ncf_list[:, continuous_features], metric=metric)[0]
 
       if agg is None:
           return dist
