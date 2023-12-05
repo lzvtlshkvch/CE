@@ -671,7 +671,7 @@ def dist_fit(df_dev, feature):
         # fitter
         distributions_set = get_common_distributions()
         distributions_set.extend(['arcsine','cosine', 'expo', 'weibull_max', 'weibull_min', 'weibull', 't', 'pareto', 'exp on norm', 'lognorm', "norm", "exponweib", "weibull_max", "weibull_min", "pareto", "genextreme"])
-        f = = Fitter(SR_y, distributions = distributions_set)
+        f = Fitter(SR_y, distributions = distributions_set)
         f.fit()
         
         fig, ax - plt.subplots()
