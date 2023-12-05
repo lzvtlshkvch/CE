@@ -678,4 +678,4 @@ def dist_fit(df_dev, feature):
         sns.distplot(SR_y, bins=25, color="g", ax=ax)
         plt.show()
         print(pd.DataFrame(y_).describe())
-        print(f.summary())
+        return f.summary()
