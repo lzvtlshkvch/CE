@@ -41,6 +41,7 @@ from sklearn.svm import LinearSVC
 from keras.callbacks import TensorBoard
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
+from fitter import Fitter, get_common_distributions, get_distributions
 
 def missing_values_table(df):
         # Total missing values
@@ -661,3 +662,20 @@ def immutable_data(example):
     d[c] = [example[c]]
   d[TARGET] = [1]
   return pd.DataFrame(data = d)
+
+
+
+def dist_fit(df_dev, feature):
+        y_ = np.array(df_dev[feature])
+        SR_y = pd.Series(y_, name=f"(feature}")
+        # fitter
+        distributions_set = get_common_distributions()
+        distributions_set.extend(['arcsine','cosine', 'expo', 'weibull_max', 'weibull_min', 'weibull', 't', 'pareto', 'exp on norm', 'lognorm', "norm", "exponweib", "weibull_max", "weibull_min", "pareto", "genextreme"])
+        f = = Fitter(SR_y, distributions = distributions_set)
+        f.fit()
+        
+        fig, ax - plt.subplots()
+        sns.distplot(SR_y, bins=25, color="g", ax=ax)
+        plt.show()
+        print(pd.DataFrame(y_).describe())
+        print(f.summary())
