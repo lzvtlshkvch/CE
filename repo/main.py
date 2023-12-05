@@ -674,7 +674,7 @@ def dist_fit(df_dev, feature):
         f = Fitter(SR_y, distributions = distributions_set)
         f.fit()
         
-        fig, ax - plt.subplots()
+        fig, ax = plt.subplots()
         sns.distplot(SR_y, bins=25, color="g", ax=ax)
         plt.show()
         print(pd.DataFrame(y_).describe())
