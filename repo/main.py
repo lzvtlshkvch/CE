@@ -668,9 +668,9 @@ def immutable_data(example):
 def dist_fit(df_dev, feature):
         y_ = np.array(df_dev[feature])
         SR_y = pd.Series(y_, name=f"{feature}")
-        # fitter
-        distributions_set = get_common_distributions()
-        distributions_set.extend(['arcsine','cosine', 'expo', 'weibull_max', 'weibull_min', 'weibull', 't', 'pareto', 'exp on norm', 'lognorm', "norm", "exponweib", "weibull_max", "weibull_min", "pareto", "genextreme"])
+        # distributions_set = get_common_distributions()
+        # distributions_set.extend(['arcsine','cosine', 'expo', 'weibull_max', 'weibull_min', 'weibull', 't', 'pareto', 'exp on norm', 'lognorm', "norm", "exponweib", "weibull_max", "weibull_min", "pareto", "genextreme"])
+        distributions_set = ['norm' 'beta', 'truncnorm', 'gamma', 'gaussian_kde'] #'uniform',
         f = Fitter(SR_y, distributions = distributions_set)
         f.fit()
         
