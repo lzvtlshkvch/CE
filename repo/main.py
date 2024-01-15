@@ -683,7 +683,7 @@ def dist_fit(df_dev, feature):
 import sklearn.svm
 import optuna
 
-def objective(trial):
+def objective(trial, X, y):
 
     classifier = trial.suggest_categorical('classifier', ['RandomForest', 'CatBoost'])
 
