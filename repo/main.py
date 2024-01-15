@@ -39,8 +39,8 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import LinearSVC
 
 # from keras.callbacks import TensorBoard
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
+# from keras.models import Sequential
+# from keras.layers import Dense, Dropout
 from fitter import Fitter, get_common_distributions, get_distributions
 
 def missing_values_table(df):
