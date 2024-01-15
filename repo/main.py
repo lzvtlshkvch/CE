@@ -679,3 +679,38 @@ def dist_fit(df_dev, feature):
         plt.show()
         print(pd.DataFrame(y_).describe())
         return f.summary()
+
+import sklearn.svm
+import optuna
+
+def objective(trial):
+
+    classifier = trial.suggest_categorical('classifier', ['RandomForest', 'CatBoost'])
+
+    if classifier == 'RandomForest':
+      params = {
+          'n_estimators': trial.suggest_int('n_estimators', 50, 300, step=50),
+          'max_depth': trial.suggest_int('max_depth', 1, 15),
+          # 'max_features': trial.suggest_categorical('max_features', ['auto', 'sqrt', 'log2']),
+          'criterion':  trial.suggest_categorical('criterion', ['gini']),
+          'class_weight': trial.suggest_categorical('class_weight', ['balanced'])
+      }
+
+      clf = sklearn.ensemble.RandomForestClassifier(
+            **params)
+    else:
+      params = {
+          'iterations': trial.suggest_int('iterations', 50, 300, step=50),
+          'learning_rate': trial.suggest_float('learning_rate', 0.01, 1, log=True),
+          'depth': trial.suggest_int('depth', 1, 15),
+          'l2_leaf_reg': trial.suggest_int('l2_leaf_reg', 1, 15),
+          'custom_loss': trial.suggest_categorical('custom_loss', ['AUC']),
+          # 'class_weights': trial.suggest_categorical('class_weights', [class_weights]),
+          'auto_class_weights': trial.suggest_categorical('auto_class_weights', ['Balanced'])
+
+      }
+
+      clf = CatBoostClassifier(**params)
+    scoring = 'roc_auc'
+    # return cross_val_score(clf, X, y, n_jobs=-1, cv=3).mean()
+    return cross_val_score(clf, X, y, cv=kfold, scoring=scoring).mean()
