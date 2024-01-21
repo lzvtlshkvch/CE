@@ -278,6 +278,7 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
     for i in range(factuals.shape[0]):
         factual = factuals.iloc[i,:]
         counterfactuals = synthetic_data.copy()
+        counterfactuals = counterfactuals.drop_duplicates(keep='first')
         for j in immutable_attr:
             counterfactuals[i] = factual[j]
             
@@ -312,6 +313,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
     continuous_features = [df.columns.get_loc(c) for c in cont_cols if c in df]
     categorical_features = [df.columns.get_loc(c) for c in cat_cols if c in df]
     counterfactuals = synthetic_data.copy()
+    counterfactuals = counterfactuals.drop_duplicates(keep='first')
     for i in immutable_attr:
         counterfactuals[i] = factual[i]
         
