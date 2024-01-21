@@ -295,3 +295,32 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
 
     return res_df, counterfactuals
 
+def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_val, f_indexes, 
+                  mutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
+                      
+    counterfactuals = synthetic_data.copy()
+    for i in immutable_attr:
+        counterfactuals[i] = factual[i]
+        
+    counterfactuals[TARGET] = model.predict(synthetic_data)                # predicting target labels
+    counterfactuals = counterfactuals[counterfactuals[TARGET] == y_val]        # selecting counterfactuals 
+    # computing distances using l2 norm 
+    f, c  = standartize(factual, counterfactuals)    
+    counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop(['kredit'], axis = 1), ord = 2, axis = 1) 
+    # sorting and selecting top k counterfactuals
+    counterfactuals = counterfactuals.sort_values(by = 'dist', ascending = True)
+    counterfactuals = counterfactuals[0:k]
+    counterfactuals.drop(['dist'], axis = 1, inplace = True)
+    print(f'A total of {counterfactuals.shape[0] :3d} counterfactuals were found')
+    cf_list = np.array(counterfactuals.drop(TARGET, axis=1))
+    res = metrics.evaluate_cf_list(cf_list, example.values[0], model, y_val, variable_features, continuous_features,
+                    categorical_features, X)
+
+    res['method'] = 'synthetic_method'
+    res['f_index'] = n_row
+
+    example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{n_row}'})
+    res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, counterfactuals.reset_index()]),
+        pd.DataFrame(res)], axis=1).fillna('metrics')], axis=0)
+
+return res_df, counterfactuals
