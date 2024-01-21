@@ -220,7 +220,7 @@ import dice_ml
 from dice_ml.utils import helpers
 
 def CF_evaluation_DICE(df, model, y_val, f_indexes, 
-                  mutable_attr, cat_cols, cont_cols, n, TARGET, res_df):
+                  mutable_attr, cat_cols, cont_cols, n, TARGET, res_df, seed):
     for i in f_indexes:
         n_row = i
         y_val = 1
