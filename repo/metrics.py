@@ -91,7 +91,7 @@ def plausibility_domain(cf_list, X, variable_features):
 def plausibility_lof(x, cf_list, X, variable_features, scaler):
     
     nX = scaler.transform(X)
-    ncf_list = scaler.transform(counterfactuals.drop(TARGET, axis=1))
+    ncf_list = scaler.transform(cf_list)
     lof = LocalOutlierFactor(n_neighbors = 10, metric = 'l2').fit(nX)
     neigh_dist, neigh_ind = lof.kneighbors(ncf_list)
     return neigh_dist.mean(axis = 1)
