@@ -210,3 +210,88 @@ columns = [ 'validity',
             'plausibility_lof_mean',
             'plausibility_lof_std',
 ]
+
+
+
+
+
+
+import dice_ml
+from dice_ml.utils import helpers
+
+def CF_evaluation_DICE(df, model, y_val, f_indexes, 
+                  mutable_attr, cat_cols, cont_cols, n, TARGET, res_df):
+    for i in f_indexes:
+        n_row = i
+        y_val = 1
+        max_nbr_cf = None
+        variable_features = [df.columns.get_loc(c) for c in mutable_attr if c in df]
+        continuous_features = [df.columns.get_loc(c) for c in cont_cols if c in df]
+        categorical_features = [df.columns.get_loc(c) for c in cat_cols if c in df]
+
+        dice_data = dice_ml.Data(dataframe=df,
+                      continuous_features=cont_cols,
+                      outcome_name=TARGET)
+        dice_model = dice_ml.Model(model=model, backend="sklearn")
+        explainer = dice_ml.Dice(dice_data,dice_model, method="random")
+        example = df.iloc[n_row:n_row+1:].drop(TARGET, axis=1)
+        e1 = explainer.generate_counterfactuals(example, total_CFs=n, desired_class='opposite',
+                                                            features_to_vary= mutable_attr,
+                                                            proximity_weight=0.5,
+                                                            diversity_weight=1.0, random_seed=seed)
+
+        cf_df = e1.cf_examples_list[0].final_cfs_df.drop(TARGET, axis=1)
+
+        for col in mutable_attr:
+            cf_df[col] = cf_df[col].astype('int64')
+        cf_list = np.array(cf_df)
+        res_DICE = evaluate_cf_list(cf_list, example.values[0], model, y_val, variable_features, continuous_features,
+                            categorical_features, X)
+
+        res_DICE['method'] = 'DICE'
+        res_DICE['f_index'] = n_row
+
+    #     cf_df['PREDICT'] = model.predict(cf_df)
+        cf_df[TARGET] = model.predict(cf_df)
+        example_df = df.iloc[n_row:n_row+1:].rename(index={n_row: f'F_{n_row}'})
+    #     example_df['PREDICT'] = model.predict(example_df.drop([TARGET], axis = 1))
+        res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, cf_df]),
+            pd.DataFrame(res_DICE)], axis=1).fillna('metrics')], axis=0)
+        
+    return res_df, cf_df
+
+
+
+def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_indexes, 
+                  mutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
+    
+    factuals = df.iloc[f_indexes]
+    for i in range(factuals.shape[0]):
+        factual = factuals.iloc[i,:]
+        counterfactuals = synthetic_data.copy()
+        for i in immutable_attr:
+            counterfactuals[i] = factual[i]
+            
+        counterfactuals[TARGET] = model.predict(synthetic_data)                # predicting target labels
+        counterfactuals = counterfactuals[counterfactuals[TARGET] == y_val]        # selecting counterfactuals 
+        # computing distances using l2 norm 
+        f, c  = standartize(factual, counterfactuals)    
+        counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop(['kredit'], axis = 1), ord = 2, axis = 1) 
+        # sorting and selecting top k counterfactuals
+        counterfactuals = counterfactuals.sort_values(by = 'dist', ascending = True)
+        counterfactuals = counterfactuals[0:k]
+        counterfactuals.drop(['dist'], axis = 1, inplace = True)
+        print(f'A total of {counterfactuals.shape[0] :3d} counterfactuals were found')
+        cf_list = np.array(counterfactuals.drop(TARGET, axis=1))
+        res = metrics.evaluate_cf_list(cf_list, example.values[0], model, y_val, variable_features, continuous_features,
+                        categorical_features, X)
+
+        res['method'] = 'synthetic_method'
+        res['f_index'] = n_row
+
+        example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{n_row}'})
+        res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, counterfactuals.reset_index()]),
+            pd.DataFrame(res)], axis=1).fillna('metrics')], axis=0)
+
+    return res_df, counterfactuals
+
