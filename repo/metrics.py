@@ -282,7 +282,7 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
         for j in immutable_attr:
             counterfactuals[i] = factual[j]
             
-        counterfactuals[TARGET] = model.predict(synthetic_data)                # predicting target labels
+        counterfactuals[TARGET] = model.predict(counterfactuals)                # predicting target labels
         counterfactuals = counterfactuals[counterfactuals[TARGET] == y_val]        # selecting counterfactuals 
         # computing distances using l2 norm 
         if not counterfactuals.empty:
@@ -317,7 +317,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
     for i in immutable_attr:
         counterfactuals[i] = factual[i]
         
-    counterfactuals[TARGET] = model.predict(synthetic_data)                # predicting target labels
+    counterfactuals[TARGET] = model.predict(counterfactuals)                # predicting target labels
     counterfactuals = counterfactuals[counterfactuals[TARGET] == y_val]        # selecting counterfactuals 
     # computing distances using l2 norm 
     if not counterfactuals.empty:
