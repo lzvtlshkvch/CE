@@ -224,7 +224,6 @@ def CF_evaluation_DICE(df, model, y_val, f_indexes,
                   mutable_attr, cat_cols, cont_cols, n, TARGET, res_df, seed):
     for i in f_indexes:
         n_row = i
-        y_val = 1
         max_nbr_cf = None
         variable_features = [df.columns.get_loc(c) for c in mutable_attr if c in df]
         continuous_features = [df.columns.get_loc(c) for c in cont_cols if c in df]
