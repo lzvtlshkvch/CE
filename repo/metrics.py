@@ -270,6 +270,10 @@ def standartize(factual, counterfactuals, df):
 def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_indexes, 
                   mutable_attr,immutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
     
+    variable_features = [df.columns.get_loc(c) for c in mutable_attr if c in df]
+    continuous_features = [df.columns.get_loc(c) for c in cont_cols if c in df]
+    categorical_features = [df.columns.get_loc(c) for c in cat_cols if c in df]
+
     factuals = df.iloc[f_indexes]
     for i in range(factuals.shape[0]):
         factual = factuals.iloc[i,:]
@@ -303,6 +307,9 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
 def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_val, f_indexes, 
                   mutable_attr, immutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
                       
+    variable_features = [df.columns.get_loc(c) for c in mutable_attr if c in df]
+    continuous_features = [df.columns.get_loc(c) for c in cont_cols if c in df]
+    categorical_features = [df.columns.get_loc(c) for c in cat_cols if c in df]
     counterfactuals = synthetic_data.copy()
     for i in immutable_attr:
         counterfactuals[i] = factual[i]
