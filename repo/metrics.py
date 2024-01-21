@@ -323,4 +323,4 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
     res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, counterfactuals.reset_index()]),
         pd.DataFrame(res)], axis=1).fillna('metrics')], axis=0)
 
-return res_df, counterfactuals
+    return res_df, counterfactuals
