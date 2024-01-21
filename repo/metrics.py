@@ -288,7 +288,7 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
         counterfactuals.drop(['dist'], axis = 1, inplace = True)
         print(f'A total of {counterfactuals.shape[0] :3d} counterfactuals were found')
         cf_list = np.array(counterfactuals.drop(TARGET, axis=1))
-        res = evaluate_cf_list(cf_list, example.values[0], model, y_val, variable_features, continuous_features,
+        res = evaluate_cf_list(cf_list, factual.drop(TARGET, axis=0).values, model, y_val, variable_features, continuous_features,
                         categorical_features, X)
 
         res['method'] = synthetic_method
@@ -318,7 +318,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
     counterfactuals.drop(['dist'], axis = 1, inplace = True)
     print(f'A total of {counterfactuals.shape[0] :3d} counterfactuals were found')
     cf_list = np.array(counterfactuals.drop(TARGET, axis=1))
-    res = evaluate_cf_list(cf_list, example.values[0], model, y_val, variable_features, continuous_features,
+    res = evaluate_cf_list(cf_list, factual.drop(TARGET, axis=0).values, model, y_val, variable_features, continuous_features,
                     categorical_features, X)
 
     res['method'] = synthetic_method
