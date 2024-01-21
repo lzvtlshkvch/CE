@@ -278,8 +278,8 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
     for i in range(factuals.shape[0]):
         factual = factuals.iloc[i,:]
         counterfactuals = synthetic_data.copy()
-        for i in immutable_attr:
-            counterfactuals[i] = factual[i]
+        for j in immutable_attr:
+            counterfactuals[i] = factual[j]
             
         counterfactuals[TARGET] = model.predict(synthetic_data)                # predicting target labels
         counterfactuals = counterfactuals[counterfactuals[TARGET] == y_val]        # selecting counterfactuals 
@@ -296,9 +296,9 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
                         categorical_features, df.drop(TARGET, axis=1))
 
         res['method'] = synthetic_method
-        res['f_index'] = n_row
+        res['f_index'] = f_indexes[i]
 
-        example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{n_row}'})
+        example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{f_indexes[i]}'})
         res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, counterfactuals.reset_index()]),
             pd.DataFrame(res)], axis=1).fillna('metrics')], axis=0)
 
@@ -329,9 +329,9 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
                     categorical_features, df.drop(TARGET, axis=1))
 
     res['method'] = synthetic_method
-    res['f_index'] = n_row
+    res['f_index'] = f_indexes
 
-    example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{n_row}'})
+    example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{f_indexes}'})
     res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, counterfactuals.reset_index()]),
         pd.DataFrame(res)], axis=1).fillna('metrics')], axis=0)
 
