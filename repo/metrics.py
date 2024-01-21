@@ -330,7 +330,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
 
     res['method'] = synthetic_method
     res['f_index'] = f_indexes    
-    n_row = f_indexes[i]
+    n_row = f_indexes
     example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{n_row}'})
     res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, counterfactuals.reset_index()]),
         pd.DataFrame(res)], axis=1).fillna('metrics')], axis=0)
