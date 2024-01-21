@@ -261,7 +261,11 @@ def CF_evaluation_DICE(df, model, y_val, f_indexes,
         
     return res_df, cf_df
 
-
+def standartize(factual, counterfactuals, df):
+    scaler = StandardScaler(with_mean=True, with_std=True).fit(df)
+    f = pd.DataFrame(scaler.transform(factual.values.reshape(1,-1)), columns = counterfactuals.columns)
+    c = pd.DataFrame(scaler.transform(counterfactuals), columns = counterfactuals.columns)
+    return f,c
 
 def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_indexes, 
                   mutable_attr,immutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
@@ -276,7 +280,7 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
         counterfactuals[TARGET] = model.predict(synthetic_data)                # predicting target labels
         counterfactuals = counterfactuals[counterfactuals[TARGET] == y_val]        # selecting counterfactuals 
         # computing distances using l2 norm 
-        f, c  = standartize(factual, counterfactuals)    
+        f, c  = standartize(factual, counterfactuals, df)    
         counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop(['kredit'], axis = 1), ord = 2, axis = 1) 
         # sorting and selecting top k counterfactuals
         counterfactuals = counterfactuals.sort_values(by = 'dist', ascending = True)
@@ -306,7 +310,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
     counterfactuals[TARGET] = model.predict(synthetic_data)                # predicting target labels
     counterfactuals = counterfactuals[counterfactuals[TARGET] == y_val]        # selecting counterfactuals 
     # computing distances using l2 norm 
-    f, c  = standartize(factual, counterfactuals)    
+    f, c  = standartize(factual, counterfactuals, df)    
     counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop(['kredit'], axis = 1), ord = 2, axis = 1) 
     # sorting and selecting top k counterfactuals
     counterfactuals = counterfactuals.sort_values(by = 'dist', ascending = True)
