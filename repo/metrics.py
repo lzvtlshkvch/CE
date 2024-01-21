@@ -318,7 +318,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
     counterfactuals[TARGET] = model.predict(synthetic_data)                # predicting target labels
     counterfactuals = counterfactuals[counterfactuals[TARGET] == y_val]        # selecting counterfactuals 
     # computing distances using l2 norm 
-    if not counterfactuals.empty::
+    if not counterfactuals.empty:
         f, c  = standartize(factual, counterfactuals, df)    
         counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop(['kredit'], axis = 1), ord = 2, axis = 1) 
         # sorting and selecting top k counterfactuals
