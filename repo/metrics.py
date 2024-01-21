@@ -246,7 +246,7 @@ def CF_evaluation_DICE(df, model, y_val, f_indexes,
             cf_df[col] = cf_df[col].astype('int64')
         cf_list = np.array(cf_df)
         res_DICE = evaluate_cf_list(cf_list, example.values[0], model, y_val, variable_features, continuous_features,
-                            categorical_features, X)
+                            categorical_features, df.drop(TARGET, axis=1))
 
         res_DICE['method'] = 'DICE'
         res_DICE['f_index'] = n_row
