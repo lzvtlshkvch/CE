@@ -264,7 +264,7 @@ def CF_evaluation_DICE(df, model, y_val, f_indexes,
 
 
 def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_indexes, 
-                  mutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
+                  mutable_attr,immutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
     
     factuals = df.iloc[f_indexes]
     for i in range(factuals.shape[0]):
@@ -297,7 +297,7 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
     return res_df, counterfactuals
 
 def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_val, f_indexes, 
-                  mutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
+                  mutable_attr, immutable_attr, cat_cols, cont_cols, k, TARGET, res_df):
                       
     counterfactuals = synthetic_data.copy()
     for i in immutable_attr:
