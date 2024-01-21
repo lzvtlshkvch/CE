@@ -89,24 +89,24 @@ def plausibility_domain(cf_list, X, variable_features):
     return nbr_plausibility
 
 def plausibility_lof(x, cf_list, X, variable_features, scaler):
+    
+    nX = scaler.transform(X)
+    ncf_list = scaler.transform(counterfactuals.drop(TARGET, axis=1))
+    lof = LocalOutlierFactor(n_neighbors = 10, metric = 'l2').fit(nX)
+    neigh_dist, neigh_ind = lof.kneighbors(ncf_list)
+    return neigh_dist.mean(axis = 1)
+    
+    # nbr_plausibility = []
     # nX = scaler.transform(X)
     # ncf_list = scaler.transform(cf_list)
     # clf = LocalOutlierFactor(n_neighbors=3, novelty=True)
-    # clf.fit(nX)
-    # lof_values = clf.predict(ncf_list)
-    # # lof_values_nof = clf.negative_outlier_factor_
-    
-    nbr_plausibility = []
-    nX = scaler.transform(X)
-    ncf_list = scaler.transform(cf_list)
-    clf = LocalOutlierFactor(n_neighbors=3, novelty=True)
-    lof_values = []
-    for var in variable_features:
-        clf.fit(np.vstack(nX[:, var]))
-        lof_values.append(clf.predict(np.vstack(ncf_list[:, var])))
-    nbr_plausibility = np.array(lof_values)
-    nbr_plausibility = [(nbr_plausibility[:,i] < 0).sum() for i in range(len(cf_list))]
-    return nbr_plausibility
+    # lof_values = []
+    # for var in variable_features:
+    #     clf.fit(np.vstack(nX[:, var]))
+    #     lof_values.append(clf.predict(np.vstack(ncf_list[:, var])))
+    # nbr_plausibility = np.array(lof_values)
+    # nbr_plausibility = [(nbr_plausibility[:,i] < 0).sum() for i in range(len(cf_list))]
+    # return nbr_plausibility
     
 def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_features,
                      categorical_features, X):
