@@ -298,7 +298,7 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
         res['method'] = synthetic_method
         res['f_index'] = f_indexes[i]
 
-        example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{f_indexes[i]}'})
+        example_df = pd.DataFrame(factual).T.rename(index={f_indexes[i]: f'F_{f_indexes[i]}'})
         res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, counterfactuals.reset_index()]),
             pd.DataFrame(res)], axis=1).fillna('metrics')], axis=0)
 
@@ -331,7 +331,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
     res['method'] = synthetic_method
     res['f_index'] = f_indexes
 
-    example_df = pd.DataFrame(factual).T.rename(index={n_row: f'F_{f_indexes}'})
+    example_df = pd.DataFrame(factual).T.rename(index={f_indexes[i]: f'F_{f_indexes}'})
     res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, counterfactuals.reset_index()]),
         pd.DataFrame(res)], axis=1).fillna('metrics')], axis=0)
 
