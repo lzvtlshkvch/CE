@@ -286,7 +286,7 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
         # computing distances using l2 norm 
         if not counterfactuals.empty:
             f, c  = standartize(factual, counterfactuals, df)    
-            counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop(['kredit'], axis = 1), ord = 2, axis = 1) 
+            counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop([TARGET], axis = 1), ord = 2, axis = 1) 
             # sorting and selecting top k counterfactuals
             counterfactuals = counterfactuals.sort_values(by = 'dist', ascending = True)
             counterfactuals = counterfactuals[0:k]
@@ -321,7 +321,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
     # computing distances using l2 norm 
     if not counterfactuals.empty:
         f, c  = standartize(factual, counterfactuals, df)    
-        counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop(['kredit'], axis = 1), ord = 2, axis = 1) 
+        counterfactuals['dist'] = np.linalg.norm((c - f.values.reshape(1, -1)).drop([TARGET], axis = 1), ord = 2, axis = 1) 
         # sorting and selecting top k counterfactuals
         counterfactuals = counterfactuals.sort_values(by = 'dist', ascending = True)
         counterfactuals = counterfactuals[0:k]
