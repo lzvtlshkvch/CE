@@ -79,6 +79,14 @@ def diversity_l2(cf_list, continuous_features, metric='euclidean', scaler=None, 
     else:
         return np.nan
 
+from sklearn.preprocessing import scale
+from sklearn.metrics import pairwise_distances
+ 
+def diversity(counterfactuals, metric = 'l2'):
+    counterfactuals = pd.DataFrame(scale(counterfactuals), columns = counterfactuals.columns)
+    dist = pairwise_distances(counterfactuals, metric = metric)
+    return np.triu(dist,k = 1).sum() / counterfactuals.shape[0] / counterfactuals.shape[0]
+
 def plausibility_domain(cf_list, X, variable_features):
     nbr_plausibility = []
     for var in variable_features:
@@ -261,7 +269,7 @@ def CF_evaluation_DICE(df, model, y_val, f_indexes,
         cf_df[TARGET] = model.predict(cf_df)
         example_df = df.iloc[n_row:n_row+1:].rename(index={n_row: f'F_{n_row}'})
     #     example_df['PREDICT'] = model.predict(example_df.drop([TARGET], axis = 1))
-        res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, cf_df.reset_index().drop('index', axis=1)]]),
+        res_df = pd.concat([res_df, pd.concat([pd.concat([example_df, cf_df.reset_index().drop('index', axis=1)]),
             pd.DataFrame(res_DICE)], axis=1).fillna('metrics')], axis=0)
         
     return res_df, cf_df
