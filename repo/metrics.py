@@ -132,8 +132,8 @@ def evaluate_cf_list(cf_list, cf_df, x, model, y_val, variable_features, continu
         validity_ = nbr_valid_cf(cf_list, model, y_val, y_desidered=None)
         proximity_ = distance_l2(x, cf_list, continuous_features, metric='euclidean', scaler=scaler, X=None)
         sparsity_ = nbr_changes_per_cf(x, cf_list, variable_features)
-        plausibility_domain_ = plausibility_domain(cf_list, X, variable_features)
-        # plausibility_lof_ = plausibility_lof(x, cf_list, X, variable_features, scaler)
+        # plausibility_domain_ = plausibility_domain(cf_list, X, variable_features)
+        plausibility_lof_ = plausibility_lof(x, cf_list, X, variable_features, scaler)
         
         if len(cf_list) > 1:
             diversity_ = diversity(cf_df, metric = 'l2')
@@ -143,10 +143,10 @@ def evaluate_cf_list(cf_list, cf_df, x, model, y_val, variable_features, continu
             proximity_std = proximity_.std()
             sparsity_mean = sparsity_.mean()
             sparsity_std = sparsity_.std()
-            plausibility_domain_mean = np.mean(plausibility_domain_)
-            plausibility_domain_std = np.std(plausibility_domain_)
-            # plausibility_lof_mean = np.mean(plausibility_lof_)
-            # plausibility_lof_std =  np.mean(plausibility_lof_)
+            # plausibility_domain_mean = np.mean(plausibility_domain_)
+            # plausibility_domain_std = np.std(plausibility_domain_)
+            plausibility_lof_mean = np.mean(plausibility_lof_)
+            plausibility_lof_std =  np.mean(plausibility_lof_)
         else:
             diversity_ = 0.0
             validity_mean = 0.0
@@ -155,16 +155,16 @@ def evaluate_cf_list(cf_list, cf_df, x, model, y_val, variable_features, continu
             proximity_std = 0.0
             sparsity_mean = 0.0
             sparsity_std = 0.0
-            plausibility_domain_mean = 0.0
-            plausibility_domain_std =  0.0
-            # plausibility_lof_mean = 0.0
-            # plausibility_lof_std =  0.0
+            # plausibility_domain_mean = 0.0
+            # plausibility_domain_std =  0.0
+            plausibility_lof_mean = 0.0
+            plausibility_lof_std =  0.0
     
         res = {
             'validity': validity_,
             'proximity': proximity_,
             'sparsity': sparsity_,
-            'plausibility_domain': plausibility_domain_,
+            # 'plausibility_domain': plausibility_domain_,
             'plausibility_lof': plausibility_lof_,
             'diversity': diversity_,
             'validity_mean': validity_mean,
@@ -173,10 +173,10 @@ def evaluate_cf_list(cf_list, cf_df, x, model, y_val, variable_features, continu
             'proximity_std': proximity_std,
             'sparsity_mean': sparsity_mean,
             'sparsity_std': sparsity_std,
-            'plausibility_domain_mean': plausibility_domain_mean,
-            'plausibility_domain_std': plausibility_domain_std,
-            # 'plausibility_lof_mean': plausibility_lof_mean,
-            # 'plausibility_lof_std': plausibility_lof_std,
+            # 'plausibility_domain_mean': plausibility_domain_mean,
+            # 'plausibility_domain_std': plausibility_domain_std,
+            'plausibility_lof_mean': plausibility_lof_mean,
+            'plausibility_lof_std': plausibility_lof_std,
         }
 
     else:
@@ -184,7 +184,7 @@ def evaluate_cf_list(cf_list, cf_df, x, model, y_val, variable_features, continu
             'validity': np.nan,
             'proximity': np.nan,
             'sparsity': np.nan,
-            'plausibility_domain': np.nan,
+            # 'plausibility_domain': np.nan,
             'plausibility_lof': np.nan,
             'diversity': np.nan,
             'validity_mean': np.nan,
@@ -193,10 +193,10 @@ def evaluate_cf_list(cf_list, cf_df, x, model, y_val, variable_features, continu
             'proximity_std': np.nan,
             'sparsity_mean': np.nan,
             'sparsity_std': np.nan,
-            'plausibility_domain_mean': np.nan,
-            'plausibility_domain_std': np.nan,
-            # 'plausibility_lof_mean': np.nan,
-            # 'plausibility_lof_std': np.nan,
+            # 'plausibility_domain_mean': np.nan,
+            # 'plausibility_domain_std': np.nan,
+            'plausibility_lof_mean': np.nan,
+            'plausibility_lof_std': np.nan,
             
         }
 
@@ -205,7 +205,7 @@ def evaluate_cf_list(cf_list, cf_df, x, model, y_val, variable_features, continu
 columns = [ 'validity',
             'proximity',
             'sparsity',
-            'plausibility_domain',
+            # 'plausibility_domain',
             'plausibility_lof',
             'diversity',
             'validity_mean',
@@ -214,10 +214,10 @@ columns = [ 'validity',
             'proximity_std',
             'sparsity_mean',
             'sparsity_std',
-            'plausibility_domain_mean',
-            'plausibility_domain_std',
-            # 'plausibility_lof_mean',
-            # 'plausibility_lof_std',
+            # 'plausibility_domain_mean',
+            # 'plausibility_domain_std',
+            'plausibility_lof_mean',
+            'plausibility_lof_std',
 ]
 
 
