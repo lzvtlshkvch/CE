@@ -136,7 +136,7 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
         plausibility_lof_ = plausibility_lof(x, cf_list, X, variable_features, scaler)
         
         if len(cf_list) > 1:
-            diversity_ = diversity(counterfactuals, metric = 'l2')
+            diversity_ = diversity(cf_list, metric = 'l2')
             validity_mean = validity_.mean()
             validity_std = validity_.std()
             proximity_mean = proximity_.mean()
