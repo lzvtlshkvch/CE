@@ -117,7 +117,7 @@ def plausibility_lof(x, cf_list, X, variable_features, scaler):
     # nbr_plausibility = [(nbr_plausibility[:,i] < 0).sum() for i in range(len(cf_list))]
     # return nbr_plausibility
     
-def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_features,
+def evaluate_cf_list(cf_list, cf_df, x, model, y_val, variable_features, continuous_features,
                      categorical_features, X):
                          
     scaler = StandardScaler()
@@ -133,7 +133,7 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
         proximity_ = distance_l2(x, cf_list, continuous_features, metric='euclidean', scaler=scaler, X=None)
         sparsity_ = nbr_changes_per_cf(x, cf_list, variable_features)
         plausibility_domain_ = plausibility_domain(cf_list, X, variable_features)
-        plausibility_lof_ = plausibility_lof(x, cf_list, X, variable_features, scaler)
+        # plausibility_lof_ = plausibility_lof(x, cf_list, X, variable_features, scaler)
         
         if len(cf_list) > 1:
             diversity_ = diversity(cf_list, metric = 'l2')
@@ -145,8 +145,8 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
             sparsity_std = sparsity_.std()
             plausibility_domain_mean = np.mean(plausibility_domain_)
             plausibility_domain_std = np.std(plausibility_domain_)
-            plausibility_lof_mean = np.mean(plausibility_lof_)
-            plausibility_lof_std =  np.mean(plausibility_lof_)
+            # plausibility_lof_mean = np.mean(plausibility_lof_)
+            # plausibility_lof_std =  np.mean(plausibility_lof_)
         else:
             diversity_ = 0.0
             validity_mean = 0.0
@@ -157,8 +157,8 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
             sparsity_std = 0.0
             plausibility_domain_mean = 0.0
             plausibility_domain_std =  0.0
-            plausibility_lof_mean = 0.0
-            plausibility_lof_std =  0.0
+            # plausibility_lof_mean = 0.0
+            # plausibility_lof_std =  0.0
     
         res = {
             'validity': validity_,
@@ -175,8 +175,8 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
             'sparsity_std': sparsity_std,
             'plausibility_domain_mean': plausibility_domain_mean,
             'plausibility_domain_std': plausibility_domain_std,
-            'plausibility_lof_mean': plausibility_lof_mean,
-            'plausibility_lof_std': plausibility_lof_std,
+            # 'plausibility_lof_mean': plausibility_lof_mean,
+            # 'plausibility_lof_std': plausibility_lof_std,
         }
 
     else:
@@ -195,8 +195,8 @@ def evaluate_cf_list(cf_list, x, model, y_val, variable_features, continuous_fea
             'sparsity_std': np.nan,
             'plausibility_domain_mean': np.nan,
             'plausibility_domain_std': np.nan,
-            'plausibility_lof_mean': np.nan,
-            'plausibility_lof_std': np.nan,
+            # 'plausibility_lof_mean': np.nan,
+            # 'plausibility_lof_std': np.nan,
             
         }
 
@@ -216,8 +216,8 @@ columns = [ 'validity',
             'sparsity_std',
             'plausibility_domain_mean',
             'plausibility_domain_std',
-            'plausibility_lof_mean',
-            'plausibility_lof_std',
+            # 'plausibility_lof_mean',
+            # 'plausibility_lof_std',
 ]
 
 
@@ -259,7 +259,7 @@ def CF_evaluation_DICE(df, model, y_val, f_indexes,
         for col in mutable_attr:
             cf_df[col] = cf_df[col].astype('int64')
         cf_list = np.array(cf_df)
-        res_DICE = evaluate_cf_list(cf_list, example.values[0], model, y_val, variable_features, continuous_features,
+        res_DICE = evaluate_cf_list(cf_list, cf_df, example.values[0], model, y_val, variable_features, continuous_features,
                             categorical_features, df.drop(TARGET, axis=1))
 
         res_DICE['method'] = 'DICE'
@@ -307,7 +307,7 @@ def CF_evaluation_synth(df, synthetic_data, synthetic_method, model, y_val, f_in
             counterfactuals.drop(['dist'], axis = 1, inplace = True)
             print(f'A total of {counterfactuals.shape[0] :3d} counterfactuals were found')
             cf_list = np.array(counterfactuals.drop(TARGET, axis=1))
-            res = evaluate_cf_list(cf_list, factual.drop(TARGET, axis=0).values, model, y_val, variable_features, continuous_features,
+            res = evaluate_cf_list(cf_list, cf_df, factual.drop(TARGET, axis=0).values, model, y_val, variable_features, continuous_features,
                             categorical_features, df.drop(TARGET, axis=1))
     
             res['method'] = synthetic_method
@@ -342,7 +342,7 @@ def CF_evaluation_GCS(df, factual, synthetic_data, synthetic_method, model, y_va
         counterfactuals.drop(['dist'], axis = 1, inplace = True)
         print(f'A total of {counterfactuals.shape[0] :3d} counterfactuals were found')
         cf_list = np.array(counterfactuals.drop(TARGET, axis=1))
-        res = evaluate_cf_list(cf_list, factual.drop(TARGET, axis=0).values, model, y_val, variable_features, continuous_features,
+        res = evaluate_cf_list(cf_list, cf_df, factual.drop(TARGET, axis=0).values, model, y_val, variable_features, continuous_features,
                         categorical_features, df.drop(TARGET, axis=1))
     
         res['method'] = synthetic_method
