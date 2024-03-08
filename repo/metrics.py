@@ -235,10 +235,16 @@ def CF_evaluation_DICE(df, model, y_val, f_indexes,
         dice_model = dice_ml.Model(model=model, backend="sklearn")
         explainer = dice_ml.Dice(dice_data,dice_model, method=gen_method)
         example = df.iloc[n_row:n_row+1:].drop(TARGET, axis=1)
-        e1 = explainer.generate_counterfactuals(example, total_CFs=n, desired_class='opposite',
-                                                            features_to_vary= mutable_attr,
-                                                            proximity_weight=0.5,
-                                                            diversity_weight=1.0, random_seed=seed)
+        if gen_method = 'random':
+            e1 = explainer.generate_counterfactuals(example, total_CFs=n, desired_class='opposite',
+                                                                features_to_vary= mutable_attr,
+                                                                proximity_weight=0.5,
+                                                                diversity_weight=1.0, random_seed=seed)
+        else:
+            e1 = explainer.generate_counterfactuals(example, total_CFs=n, desired_class='opposite',
+                                                    features_to_vary= mutable_attr,
+                                                    proximity_weight=0.5,
+                                                    diversity_weight=1.0)
 
         cf_df = e1.cf_examples_list[0].final_cfs_df.drop(TARGET, axis=1)
 
